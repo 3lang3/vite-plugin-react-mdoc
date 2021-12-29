@@ -1,0 +1,56 @@
+* {
+  box-sizing: border-box;
+}
+
+.App {
+  display: flex;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+.prism-code {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 10px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  width: 50vw;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.demo {
+  width: 50vw;
+  background: #f2f2f2;
+  padding: 20px;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+button {
+  font-size: calc(10px + 2vmin);
+}
