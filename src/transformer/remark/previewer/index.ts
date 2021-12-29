@@ -1,24 +1,16 @@
 import fs from 'fs';
 import path from 'path';
 import type { Node } from 'unist';
-import { visit } from 'unist-util-visit';
+import visit from 'unist-util-visit';
 import slash from 'slash2';
 import demoTransformer, { DEMO_COMPONENT_NAME } from '../../demo';
 import transformer from '../..';
-import {
-  decodeImportRequireWithAutoDynamic,
-  decodeHoistImportToContent,
-} from '../../utils';
+import { decodeHoistImportToContent } from '../../utils';
 import builtinTransformer from './builtin';
 import type { IDumiUnifiedTransformer } from '..';
-import type {
-  IPreviewerTransformer,
-  IPreviewerTransformerResult,
-} from './builtin';
+import type { IPreviewerTransformer, IPreviewerTransformerResult } from './builtin';
 
-export const previewerTransforms: IPreviewerTransformer[] = [
-  builtinTransformer,
-];
+export const previewerTransforms: IPreviewerTransformer[] = [builtinTransformer];
 
 /**
  * cache id for each external demo file
@@ -31,10 +23,7 @@ const externalIdMap = new Map<string, number>();
 /**
  * record code block demo id count
  */
-const mdCodeBlockIdMap = new Map<
-  string,
-  { id: string; count: number; map: Map<string, number> }
->();
+const mdCodeBlockIdMap = new Map<string, { id: string; count: number; map: Map<string, number> }>();
 
 /**
  * get unique id for previewer
@@ -73,12 +62,12 @@ function getPreviewerId(yaml: any, mdAbsPath: string, codeAbsPath: string) {
           // discard index & suffix like index.tsx
           .replace(/(?:\/index)?(\.[\w-]+)?\.\w+$/, '$1')
           .split(/\//)
-          .map((w) => w.toLowerCase());
+          .map(w => w.toLowerCase());
         // /path/to/index.tsx -> to || /path/to.tsx -> to
         const demoName = words[words.length - 1] || 'demo';
         const prefix = words
           .slice(0, -1)
-          .filter((word) => !/^(src|_?demos?|_?examples?)$/.test(word))
+          .filter(word => !/^(src|_?demos?|_?examples?)$/.test(word))
           .pop();
 
         id = `${prefix}-${demoName}`;
@@ -104,10 +93,7 @@ function getPreviewerId(yaml: any, mdAbsPath: string, codeAbsPath: string) {
  * @param props previewer props
  * @param lang  node lang
  */
-function getDemoDeps(
-  props: IPreviewerTransformerResult['previewerProps'],
-  lang: string
-) {
+function getDemoDeps(props: IPreviewerTransformerResult['previewerProps'], lang: string) {
   return {
     // append npm dependencies
     ...Object.entries(props.dependencies || {}).reduce(
@@ -119,7 +105,7 @@ function getDemoDeps(
             value: (dep as any).version,
           },
         }),
-      {}
+      {},
     ),
     // append local file dependencies
     ...Object.entries(props.sources).reduce(
@@ -130,21 +116,17 @@ function getDemoDeps(
             ? {
                 [`index.${lang}`]: {
                   type: 'FILE',
-                  value: decodeHoistImportToContent(
-                    Object.values(item)[0] as string
-                  ),
+                  value: decodeHoistImportToContent(Object.values(item)[0] as string),
                 },
               }
             : {
                 [file]: {
                   type: 'FILE',
-                  value:
-                    item.content ||
-                    fs.readFileSync(item.path, 'utf-8').toString(),
+                  value: item.content || fs.readFileSync(item.path, 'utf-8').toString(),
                 },
               }),
         }),
-      {}
+      {},
     ),
   };
 }
@@ -154,7 +136,7 @@ function getDemoDeps(
  * @param meta  node meta data from attribute & frontmatter
  */
 function transformNodeMeta(meta: Record<string, any>) {
-  Object.keys(meta).forEach((key) => {
+  Object.keys(meta).forEach(key => {
     const matched = key.match(/^desc(?:(\.[\w-]+$)|$)/);
 
     // compatible with short-hand usage for description field in previous dumi versions
@@ -180,7 +162,7 @@ const visitor = function (node, i, parent) {
     // transform node to Previewer meta
     let previewerProps: IPreviewerTransformerResult['previewerProps'];
     // execute transformers to get the first valid result, and save currying transformer
-    previewerTransforms.some((item) => {
+    previewerTransforms.some(item => {
       const caller = () =>
         item.fn({
           attrs: { src: node.properties.src, ...node.properties.meta },
@@ -194,7 +176,7 @@ const visitor = function (node, i, parent) {
         const identifier = getPreviewerId(
           node.properties.meta,
           this.data('fileAbsPath'),
-          node.properties.filePath || this.data('fileAbsPath')
+          node.properties.filePath || this.data('fileAbsPath'),
         );
         // fill fields for tranformer result
         const decorateResult = (o: IPreviewerTransformerResult) => {
@@ -203,12 +185,8 @@ const visitor = function (node, i, parent) {
             const { meta } = transformer.code(node.properties.source);
 
             // save original attr meta on code tag, to avoid node meta override frontmatter in HMR
-            node.properties._ATTR_META =
-              node.properties._ATTR_META || node.properties.meta;
-            node.properties.meta = Object.assign(
-              meta,
-              node.properties._ATTR_META
-            );
+            node.properties._ATTR_META = node.properties._ATTR_META || node.properties.meta;
+            node.properties.meta = Object.assign(meta, node.properties._ATTR_META);
           }
 
           // transform node meta data
@@ -239,22 +217,19 @@ const visitor = function (node, i, parent) {
     });
     const code = demoTransformer(node.properties.source).content;
 
-    previewerProps.code = { default: code }
-    // use to declare demos in the page component
-    this.vFile.data.demos = (this.vFile.data.demos || []).concat({
-      name: `${DEMO_COMPONENT_NAME}${(this.vFile.data.demos?.length || 0) + 1}`,
-      code: previewerProps.inline
-        ? // insert directly for inline demo
-          `${decodeImportRequireWithAutoDynamic(code, 'demos_md_inline')}`
-        : // render other demo by id from demos context
-          code,
-    });
+    if (!previewerProps.inline) {
+      // use to declare demos in the page component
+      this.vFile.data.demos = (this.vFile.data.demos || []).concat({
+        title: previewerProps.title,
+        name: `${DEMO_COMPONENT_NAME}${(this.vFile.data.demos?.length || 0) + 1}`,
+        code,
+      });
+    }
 
     parent.children[i] = {
       previewer: true,
       type: 'element',
       tagName: 'Previewer',
-      // TODO: read props from common @@/dumi/demos module to reduce bundle size
       properties: previewerProps,
     };
   }
@@ -275,17 +250,15 @@ export default function previewer(): IDumiUnifiedTransformer {
           path.basename(
             slash(this.data('fileAbsPath')).replace(
               /(?:\/(?:index|readme))?(\.[\w-]+)?\.md/i,
-              '$1'
-            )
+              '$1',
+            ),
           );
 
         mdCodeBlockIdMap.set(this.data('fileAbsPath'), {
           // save builtin-rule id
           id: prefix,
           // save conflict count
-          count: Array.from(mdCodeBlockIdMap.values()).filter(
-            (m) => m.id === prefix
-          ).length,
+          count: Array.from(mdCodeBlockIdMap.values()).filter(m => m.id === prefix).length,
           // create code block id map
           map: new Map(),
         });

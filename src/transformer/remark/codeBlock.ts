@@ -1,4 +1,4 @@
-import { visit } from 'unist-util-visit';
+import visit from 'unist-util-visit';
 import { winEOL } from '../../utils';
 import type { IDumiUnifiedTransformer } from '.';
 import transformer from '..';

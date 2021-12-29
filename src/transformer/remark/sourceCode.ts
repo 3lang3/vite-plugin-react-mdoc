@@ -1,7 +1,6 @@
-import type { Node } from 'unist';
-import {visit} from 'unist-util-visit';
-import {toString} from 'hast-util-to-string';
-import {raw} from 'hast-util-raw';
+import visit from 'unist-util-visit';
+import toString from 'hast-util-to-string';
+import raw from 'hast-util-raw';
 import { winEOL } from '../../utils';
 import type { IDumiUnifiedTransformer, IDumiElmNode } from '.';
 
@@ -26,7 +25,7 @@ function createSourceCode(lang: string, code: string, position: any) {
 export default function sourceCode(): IDumiUnifiedTransformer {
   return ast => {
     // handle md code block syntax
-    visit<IDumiElmNode>(ast, 'element', (node, i, parent) => {
+    visit(ast, 'element', (node: any, i, parent) => {
       if (node.tagName === 'pre' && node.children?.[0]?.tagName === 'code') {
         const cls = node.children[0].properties.className || [];
         const lang = cls.join('').match(/language-(\w+)(?:$| )/)?.[1] || 'unknown';
@@ -40,7 +39,7 @@ export default function sourceCode(): IDumiUnifiedTransformer {
     });
 
     // handle pre tag syntax
-    visit<Node & { value: string }>(ast, 'raw', (node, i, parent) => {
+    visit(ast, 'raw', (node: any, i, parent) => {
       if (/^<pre/.test(node.value)) {
         const parsed = raw(node) as IDumiElmNode;
 

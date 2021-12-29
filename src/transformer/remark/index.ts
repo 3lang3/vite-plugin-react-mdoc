@@ -1,17 +1,12 @@
 import path from 'path'
-import { writeSync } from 'to-vfile'
-import { reporter } from 'vfile-reporter'
 import _createDebug from 'debug';
 import type { Transformer } from 'unified';
 import type { Node } from 'unist';
-import { unified } from 'unified'
+import unified from 'unified'
 import remarkParse from 'remark-parse'
 import remarkGfm from 'remark-gfm';
 import remarkFrontmatter from 'remark-frontmatter';
-import remarkSlug from 'remark-slug'
-import remarkToc from 'remark-toc'
 import stringify from 'rehype-stringify'
-import rehypeFormat from 'rehype-format'
 import raw from './raw'
 import code from './code'
 import rehype from './rehype'
@@ -53,10 +48,6 @@ const processor = unified()
   .use(debug('meta'))
   .use(codeBlock)
   .use(debug('codeBlock'))
-  .use(remarkSlug)
-  .use(debug('slug'))
-  .use(remarkToc)
-  .use(debug('toc'))
   .use(rehype)
   .use(debug('rehype'))
   .use(sourceCode)
@@ -67,7 +58,6 @@ const processor = unified()
   .use(debug('code'))
   .use(previewer)
   .use(debug('previewer'))
-  .use(rehypeFormat)
   .data('masterKey', masterKey)
   .data('fileAbsPath', fileAbsPath)
   .data('outputType', type);
@@ -76,10 +66,8 @@ const processor = unified()
   processor.use(rehypeCompiler[0], rehypeCompiler[1]);
   const file = processor.processSync(source);
 
-  console.error(reporter(file))
   file.path = path.dirname(path.join(__dirname, 'src'))
   file.extname = '.tsx'
-  writeSync(file)
 
   return file;
 }

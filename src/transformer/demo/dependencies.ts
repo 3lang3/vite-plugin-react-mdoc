@@ -2,8 +2,8 @@ import path from 'path';
 import slash from 'slash2';
 import crypto from 'crypto';
 import { transformSync } from '@babel/core';
-import t from '@babel/types'
-import _traverse from "@babel/traverse";
+import * as t from '@babel/types';
+import traverse from '@babel/traverse';
 import {
   getModuleResolvePkg,
   getModuleResolvePath,
@@ -12,8 +12,6 @@ import {
 import FileCache from '../../utils/cache';
 import type { IDemoOpts } from './options';
 import { getBabelOptions } from './options';
-
-const traverse = _traverse.default;
 
 const cachers = {
   file: new FileCache(),
@@ -41,10 +39,13 @@ interface IAnalyzeCache {
 }
 
 export interface IDepAnalyzeResult {
-  dependencies: Record<string, {
-    version: string;
-    css?: string;
-  }>;
+  dependencies: Record<
+    string,
+    {
+      version: string;
+      css?: string;
+    }
+  >;
   files: Record<string, { import: string; fileAbsPath: string }>;
 }
 
@@ -86,9 +87,7 @@ function analyzeDeps(
       ImportDeclaration(callPath) {
         const callPathNode = callPath.node;
         // tranverse all require statement
-        if (
-          t.isProgram(callPath.parent)
-        ) {
+        if (t.isProgram(callPath.parent)) {
           const requireStr = callPathNode.source.value;
           const resolvePath = getModuleResolvePath({
             basePath: fileAbsPath,
@@ -219,7 +218,9 @@ export function getCSSForDep(dep: string) {
     // @group/pkg-suffic => pkg-suffix
     `${pkgWithoutGroup}`,
     // @group/pkg-suffix => pkgsuffix @ant-design/pro-card => card
-    ...(pkgWithoutGroup.includes('-') ? [pkgWithoutGroup.replace(/-/g, ''), pkgWithoutGroup.split('-')[1]] : []),
+    ...(pkgWithoutGroup.includes('-')
+      ? [pkgWithoutGroup.replace(/-/g, ''), pkgWithoutGroup.split('-')[1]]
+      : []),
     // guess normal css files
     'main',
     'index',

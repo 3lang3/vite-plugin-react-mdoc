@@ -1,15 +1,21 @@
 {
   "compilerOptions": {
-    "target": "es2019",
-    "moduleResolution": "node",
+    "target": "es2017",
+    "moduleResolution": "Node",
     "noImplicitAny": false,
     "declaration": true,
     "noUnusedLocals": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "outDir": "dist",
-    "module": "commonjs",
+    "module": "ESNext",
     "lib": ["ESNext", "DOM"],
     "sourceMap": true
   },
-  "include": ["./src"]
+  "include": ["./src"],
+  "exclude": [
+    "**/dist",
+    "**/node_modules",
+    "**/test"
+  ]
 }

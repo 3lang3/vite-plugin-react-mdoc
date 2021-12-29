@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { isElement } from 'hast-util-is-element';
-import { hasProperty } from 'hast-util-has-property';
-import { visit } from 'unist-util-visit';
+import is from 'hast-util-is-element';
+import has from 'hast-util-has-property';
+import visit from 'unist-util-visit';
 import { parseElmAttrToProps } from './utils';
-import type { IDumiUnifiedTransformer, IDumiElmNode } from '.';
+import type { IDumiUnifiedTransformer } from '.';
 
 
 /**
@@ -12,16 +12,16 @@ import type { IDumiUnifiedTransformer, IDumiElmNode } from '.';
  */
  export default function code(): IDumiUnifiedTransformer {
   return ast => {
-    visit(ast, 'element', (node, index, parent) => {
-      if (isElement(node, 'code') && hasProperty(node, 'src')) {
+    visit(ast, 'element', (node: any, index, parent) => {
+      if (is(node, 'code') && has(node, 'src')) {
         // const hasCustomTransformer = previewerTransforms.length > 1;
         const { src, ...attrs } = node.properties;
         const props = {
           source: '',
-          lang: path.extname(src).slice(1),
-          filePath: path.join(path.dirname(this.data('fileAbsPath')), src),
+          lang: path.extname(src as string).slice(1),
+          filePath: path.join(path.dirname(this.data('fileAbsPath')), src as string),
         };
-        const parsedAttrs = parseElmAttrToProps(attrs);
+        const parsedAttrs = parseElmAttrToProps(attrs as any);
 
         try {
           // props.filePath = getModuleResolvePath({

@@ -32,7 +32,7 @@ export default {
       throwError?: boolean;
       masterKey?: string;
     } = {},
-  ): TransformResult {
+  ) {
     // use cache first
     let result = cacheKey && cachers.markdown.get(cacheKey);
 
@@ -55,10 +55,7 @@ export default {
       throw result.error;
     }
 
-    return {
-      content: result.value.contents,
-      meta: result.value.data,
-    } as TransformResult;
+    return result.value
   },
   /**
    * split frontmatters & content for code block

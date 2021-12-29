@@ -1,6 +1,6 @@
 import path from 'path';
 import slash from 'slash2';
-import { visit } from 'unist-util-visit';
+import visit from 'unist-util-visit';
 import type { YamlNode, IDumiUnifiedTransformer } from '.';
 import transformer from '..';
 import yaml from '../../utils/yaml';

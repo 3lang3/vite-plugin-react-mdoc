@@ -1,6 +1,6 @@
 import type { Processor } from 'unified';
 import toJSX from '@mapbox/hast-util-to-jsx';
-import { visit } from 'unist-util-visit';
+import visit from 'unist-util-visit';
 import { formatJSXProps } from '../utils';
 import { LIB_NAME } from '../../utils/const';
 
@@ -22,6 +22,6 @@ export default (function jsxify() {
       `{...${LIB_NAME}_ALL_DEMOS['$1'].previewerProps}`,
     );
 
-    return `export const Content = ({ Previewer }) => ${JSX}`;
+    return JSX;
   };
 } as Processor);
