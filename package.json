@@ -43,7 +43,7 @@
     "hast-util-to-html": "^7.1.1",
     "hast-util-to-string": "^1.0.2",
     "js-yaml": "^4.1.0",
-    "rehype-raw": "^6.1.0",
+    "rehype-raw": "^6.1.1",
     "rehype-stringify": "^8.0.0",
     "remark-frontmatter": "^3.0.0",
     "remark-gfm": "^1.0.0",
