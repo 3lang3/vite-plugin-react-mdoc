@@ -40,49 +40,17 @@ function getPreviewerId(yaml: any, mdAbsPath: string, codeAbsPath: string) {
   }
 
   if (!id) {
-    if (mdAbsPath === codeAbsPath) {
-      // for code block demo, format: component-demo-N
-      const idMap = mdCodeBlockIdMap.get(mdAbsPath);
-      id = [idMap.id, idMap.count, 'demo'].filter(Boolean).join('-');
+    // for code block demo, format: component-demo-N
+    const idMap = mdCodeBlockIdMap.get(mdAbsPath);
+    id = [idMap.id, idMap.count, 'demo'].filter(Boolean).join('-');
 
-      // record id count
-      const currentIdCount = idMap.map.get(id) || 0;
+    // record id count
+    const currentIdCount = idMap.map.get(id) || 1;
 
-      idMap.map.set(id, currentIdCount + 1);
+    idMap.map.set(id, currentIdCount + 1);
 
-      // append count suffix
-      id += currentIdCount ? `-${currentIdCount}` : '';
-    } else {
-      // for external demo, format: dir-file-N
-      // use cache first
-      id = externalCache.get(codeAbsPath);
-
-      if (!id) {
-        const words = (slash(codeAbsPath) as string)
-          // discard index & suffix like index.tsx
-          .replace(/(?:\/index)?(\.[\w-]+)?\.\w+$/, '$1')
-          .split(/\//)
-          .map(w => w.toLowerCase());
-        // /path/to/index.tsx -> to || /path/to.tsx -> to
-        const demoName = words[words.length - 1] || 'demo';
-        const prefix = words
-          .slice(0, -1)
-          .filter(word => !/^(src|_?demos?|_?examples?)$/.test(word))
-          .pop();
-
-        id = `${prefix}-${demoName}`;
-
-        // record id count
-        const currentIdCount = externalIdMap.get(id) || 0;
-
-        externalIdMap.set(id, currentIdCount + 1);
-
-        // append count suffix
-        id += currentIdCount ? `-${currentIdCount}` : '';
-
-        externalCache.set(codeAbsPath, id);
-      }
-    }
+    // append count suffix
+    id = `${currentIdCount}`;
   }
 
   return id;
@@ -215,14 +183,18 @@ const visitor = function (node, i, parent) {
       // use the first valid result
       return result;
     });
-    const code = demoTransformer(node.properties.source).content;
+    // const code = demoTransformer(node.properties.source).content;
+    const code = node.properties.source;
 
     if (!previewerProps.inline) {
       // use to declare demos in the page component
       this.vFile.data.demos = (this.vFile.data.demos || []).concat({
+        filePath: node.properties.filePath,
         title: previewerProps.title,
         name: `${DEMO_COMPONENT_NAME}${(this.vFile.data.demos?.length || 0) + 1}`,
         code,
+        language: node.properties.lang,
+        previewerProps,
       });
     }
 
@@ -230,7 +202,9 @@ const visitor = function (node, i, parent) {
       previewer: true,
       type: 'element',
       tagName: 'Previewer',
-      properties: previewerProps,
+      properties: {
+        'data-previewer-props-replaced': previewerProps.identifier,
+      },
     };
   }
 };

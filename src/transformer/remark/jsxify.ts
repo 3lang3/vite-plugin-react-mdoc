@@ -19,7 +19,7 @@ export default (function jsxify() {
     // append previewProps for previewer
     JSX = JSX.replace(
       /data-previewer-props-replaced="([^"]+)"/g,
-      `{...${LIB_NAME}_ALL_DEMOS['$1'].previewerProps}`,
+      `{...${LIB_NAME}Demo$1PreviewerProps}`,
     );
 
     return JSX;

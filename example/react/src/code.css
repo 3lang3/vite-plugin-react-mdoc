@@ -1,6 +1,3 @@
-* {
-  box-sizing: border-box;
-}
 
 .App {
   display: flex;
@@ -30,27 +27,4 @@
   flex-direction: column;
   color: #fff;
   width: 50vw;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-.demo {
-  width: 50vw;
-  background: #f2f2f2;
-  padding: 20px;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-button {
-  font-size: calc(10px + 2vmin);
 }
