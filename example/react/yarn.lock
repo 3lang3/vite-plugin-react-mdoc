@@ -752,10 +752,10 @@ react-transition-group@^4.4.1:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-react-vant@^2.0.0-alpha.12:
-  version "2.0.0-alpha.12"
-  resolved "https://registry.yarnpkg.com/react-vant/-/react-vant-2.0.0-alpha.12.tgz#4328c1e28c4389cd68f98e9bdea6cdd0177c2d38"
-  integrity sha512-8tFBFAvSds9VoljXvE5FTe80JJ/eEUsn4lpgfSUZd90vn1XrtnY1AWB/cBn7uAXKqeIVoRtSBdpF6TmXb7h77Q==
+react-vant@2.0.0-alpha.15:
+  version "2.0.0-alpha.15"
+  resolved "https://registry.yarnpkg.com/react-vant/-/react-vant-2.0.0-alpha.15.tgz#b8873e557dba045bf6da6a67951386ac485225c8"
+  integrity sha512-jP3t1R5D3pOd8q4f36ly6wS6W/hsxORnzTkW+O8nwS4YdwQwC27xMV19GwIAe+mMAsi07Wyc1qnY1z05GLRlbw==
   dependencies:
     "@react-spring/web" "^9.3.0"
     "@react-vant/icons" "0.0.6"
