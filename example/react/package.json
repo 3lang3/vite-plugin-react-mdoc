@@ -13,13 +13,13 @@
     "prismjs": "^1.25.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-vant": "^2.0.0-alpha.12"
+    "react-vant": "2.0.0-alpha.15"
   },
   "devDependencies": {
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",
-    "@vitejs/plugin-react": "^1.0.7",
     "less": "^4.1.2",
+    "@vitejs/plugin-react": "1.1.4",
     "typescript": "^4.4.4",
     "vite": "^2.7.2"
   }
