@@ -1,25 +1,24 @@
-import path from 'path'
-import _createDebug from 'debug';
+import path from 'path';
+import createDebug from 'debug';
 import type { Transformer } from 'unified';
 import type { Node } from 'unist';
-import unified from 'unified'
-import remarkParse from 'remark-parse'
+import unified from 'unified';
+import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
 import remarkFrontmatter from 'remark-frontmatter';
-import stringify from 'rehype-stringify'
-import raw from './raw'
-import code from './code'
-import rehype from './rehype'
+import stringify from 'rehype-stringify';
+import raw from './raw';
+import code from './code';
+import rehype from './rehype';
 import jsxify from './jsxify';
 import meta from './meta';
 import sourceCode from './sourceCode';
 import codeBlock from './codeBlock';
 import previewer from './previewer';
 
-const createDebug = _createDebug.default
 const log = createDebug('dumi:remark');
 
-log('name')
+log('name');
 
 function debug(name: string) {
   return function debugPlugin() {
@@ -32,45 +31,44 @@ function debug(name: string) {
 }
 
 export default (source: string, fileAbsPath: string, type: 'jsx' | 'html', masterKey?: string) => {
-  const rehypeCompiler: any = {
+  const rehypeCompiler = {
     jsx: [jsxify],
     html: [stringify, { allowDangerousHtml: true, closeSelfClosing: true }],
-  }[type];
-  
-const processor = unified()
-  .use(remarkParse)
-  .use(debug('parse'))
-  .use(remarkGfm)
-  .use(debug('gfm'))
-  .use(remarkFrontmatter)
-  .use(debug('frontmatter'))
-  .use(meta)
-  .use(debug('meta'))
-  .use(codeBlock)
-  .use(debug('codeBlock'))
-  .use(rehype)
-  .use(debug('rehype'))
-  .use(sourceCode)
-  .use(debug('sourceCode'))
-  .use(raw)
-  .use(debug('raw'))
-  .use(code)
-  .use(debug('code'))
-  .use(previewer)
-  .use(debug('previewer'))
-  .data('masterKey', masterKey)
-  .data('fileAbsPath', fileAbsPath)
-  .data('outputType', type);
+  }[type] as any;
+
+  const processor = unified()
+    .use(remarkParse)
+    .use(debug('parse'))
+    .use(remarkGfm)
+    .use(debug('gfm'))
+    .use(remarkFrontmatter)
+    .use(debug('frontmatter'))
+    .use(meta)
+    .use(debug('meta'))
+    .use(codeBlock)
+    .use(debug('codeBlock'))
+    .use(rehype)
+    .use(debug('rehype'))
+    .use(sourceCode)
+    .use(debug('sourceCode'))
+    .use(raw)
+    .use(debug('raw'))
+    .use(code)
+    .use(debug('code'))
+    .use(previewer)
+    .use(debug('previewer'))
+    .data('masterKey', masterKey)
+    .data('fileAbsPath', fileAbsPath)
 
   // apply compiler via type
   processor.use(rehypeCompiler[0], rehypeCompiler[1]);
   const file = processor.processSync(source);
 
-  file.path = path.dirname(path.join(__dirname, 'src'))
-  file.extname = '.tsx'
+  file.path = path.dirname(path.join(__dirname, 'src'));
+  file.extname = '.tsx';
 
-  return file;
-}
+  return file as any;
+};
 
 interface IDumiVFileData {
   /**
@@ -111,7 +109,6 @@ interface IDumiVFileData {
   }[];
 }
 
-
 // reserve unknown property for Node, to avoid custom plugin throw type error after @types/unist@2.0.4
 declare module 'unist' {
   // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style, @typescript-eslint/no-shadow
@@ -122,7 +119,7 @@ declare module 'unist' {
 
 export interface YamlNode extends Node {
   type: string;
-  value: string
+  value: string;
 }
 
 export interface IDumiElmNode extends Node {

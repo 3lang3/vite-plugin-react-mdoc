@@ -1,5 +1,5 @@
 {
-  "name": "vite-plugin-mdoc",
+  "name": "vite-plugin-react-mdoc",
   "version": "0.0.1-dev",
   "description": "Import markdown files in vite and get code",
   "main": "./dist/index.js",

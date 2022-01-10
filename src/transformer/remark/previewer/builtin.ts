@@ -2,9 +2,7 @@ import transformer from '../..';
 import { getDepsForDemo } from '../../demo';
 import type { IDumiElmNode } from '..';
 
-
-interface ITransformerPreviewerProps
-  extends Record<string, any> {
+interface ITransformerPreviewerProps extends Record<string, any> {
   // override sources type, transformer only need to return { path: string }
   sources: Record<
     string,
@@ -86,16 +84,15 @@ const builtinPreviewerTransformer: IPreviewerTransformer['fn'] = ({ mdAbsPath, n
 
   // collect third-party dependencies and locale file dependencies for demo
   // FIXME: handle frontmatter in the head of external demo code
-  if (!node.properties.meta?.inline) {
-    // console.log(node.properties.source)
+  if (!node.properties.meta?.inline && /(t|j)sx/.test(node.properties.lang)) {
     try {
       ({ files, dependencies } = getDepsForDemo(node.properties.source, {
         isTSX: /^tsx?$/.test(node.properties.lang),
         fileAbsPath,
       }));
-    } catch(error) {
+    } catch (error) {
       /* nothing */
-      console.log('err:',  error)
+      console.log('err:', error);
     }
   }
 

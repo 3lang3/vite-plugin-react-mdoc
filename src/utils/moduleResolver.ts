@@ -5,7 +5,7 @@ import resolve from 'enhanced-resolve';
 import getHostPkgAlias from './getHostPkgAlias';
 import ctx from '../context';
 
-const DEFAULT_EXT = ['.tsx', '.jsx', '.js', '.ts'];
+const DEFAULT_EXT = ['.tsx', '.jsx'];
 
 interface IModuleResolverOpts {
   basePath: string;

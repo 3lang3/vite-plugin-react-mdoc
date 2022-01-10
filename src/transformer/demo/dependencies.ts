@@ -77,6 +77,7 @@ function analyzeDeps(
   if (!cache) {
     cache = { dependencies: [], files: [] };
     // support to pass babel transform result directly
+    
     const { ast } = transformSync(
       raw,
       getBabelOptions({ isTSX, fileAbsPath, transformRuntime: false }),

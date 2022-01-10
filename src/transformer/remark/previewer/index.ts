@@ -31,11 +31,10 @@ const mdCodeBlockIdMap = new Map<string, { id: string; count: number; map: Map<s
  * @param mdAbsPath     md absolute path
  * @param codeAbsPath   code absolute path, it is seem as mdAbsPath for embed demo
  */
-function getPreviewerId(yaml: any, mdAbsPath: string, codeAbsPath: string) {
+function getPreviewerId(yaml: any, mdAbsPath: string, language: string) {
   let id = yaml.identifier || yaml.uuid;
-
   // do not generate identifier for inline demo
-  if (yaml.inline) {
+  if (yaml.inline || !/(t|j)sx/.test(language)) {
     return;
   }
 
@@ -144,7 +143,7 @@ const visitor = function (node, i, parent) {
         const identifier = getPreviewerId(
           node.properties.meta,
           this.data('fileAbsPath'),
-          node.properties.filePath || this.data('fileAbsPath'),
+          node.properties.lang,
         );
         // fill fields for tranformer result
         const decorateResult = (o: IPreviewerTransformerResult) => {
@@ -170,15 +169,16 @@ const visitor = function (node, i, parent) {
           o.previewerProps.identifier = identifier;
 
           // fallback dependencies & sources
-          o.previewerProps.dependencies = o.previewerProps.dependencies || {};
           o.previewerProps.sources = o.previewerProps.sources || {};
           // generate demo dependencies from previewerProps.sources
-          getDemoDeps(o.previewerProps, node.properties.lang);
+          o.previewerProps.dependencies = getDemoDeps(o.previewerProps, node.properties.lang);
           return o;
         };
 
         // export result
         ({ previewerProps } = decorateResult(result));
+
+        console.log(previewerProps.dependencies)
       }
       // use the first valid result
       return result;
@@ -186,7 +186,9 @@ const visitor = function (node, i, parent) {
     // const code = demoTransformer(node.properties.source).content;
     const code = node.properties.source;
 
-    if (!previewerProps.inline) {
+    const isDemoNode = !previewerProps.inline && /(j|t)sx/.test(node.properties.lang);
+
+    if (isDemoNode) {
       // use to declare demos in the page component
       this.vFile.data.demos = (this.vFile.data.demos || []).concat({
         filePath: node.properties.filePath,
@@ -194,17 +196,32 @@ const visitor = function (node, i, parent) {
         name: `${DEMO_COMPONENT_NAME}${(this.vFile.data.demos?.length || 0) + 1}`,
         code,
         language: node.properties.lang,
+        inline: previewerProps.inline,
+        identifier: previewerProps.identifier,
+        dependencies: previewerProps.dependencies,
         previewerProps,
       });
+    }
+
+    let properties = {};
+
+    if (isDemoNode) {
+      properties['data-previewer-props-replaced'] = previewerProps.identifier;
+    } else {
+      properties = {
+        code,
+        language: node.properties.lang,
+        inline: previewerProps.inline,
+        identifier: previewerProps.identifier,
+        title: previewerProps.title,
+      };
     }
 
     parent.children[i] = {
       previewer: true,
       type: 'element',
       tagName: 'Previewer',
-      properties: {
-        'data-previewer-props-replaced': previewerProps.identifier,
-      },
+      properties,
     };
   }
 };

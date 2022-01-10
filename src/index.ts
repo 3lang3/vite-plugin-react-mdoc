@@ -14,6 +14,13 @@ type DemoType = {
   filePath?: string;
   language?: string;
   previewerProps: any;
+  dependencies?: Record<
+    string,
+    {
+      type: string;
+      value: string;
+    }
+  >;
 };
 
 class ExportedContent {
@@ -33,48 +40,38 @@ class ExportedContent {
   }
 }
 
-function markdownToDoc(code, id) {
+async function markdownToDoc(code, id, reactBabelPlugin) {
   const content = new ExportedContent();
 
   const rs = transformer.markdown(code, id);
   const {
-    data: { demos },
+    data: { demos = [] },
     contents,
   } = rs;
 
-  const reactCode = `
-      const markdown =
-        <div>
-          ${contents}
-        </div>
-    `;
   const compiledReactCode = `
       function (props) {
         const Previewer = props.previewer;
-        ${
-          require('@babel/core').transformSync(reactCode, {
-            ast: false,
-            presets: [['@babel/preset-react']],
-          }).code
-        }
-        return markdown
+
+        return <div>
+          ${contents}
+        </div>
       }
     `;
-
-  content.addContext(`
-    import React from "react"\n
-    ${demos
-      .map(demo => {
-        const request = `${slash(id)}.${demo.name}.${demo.language || 'jsx'}`;
-
-        debug(`import -> ${id}`);
-        debug(`import -> ${request}`);
-        demo.id = request;
-        return `import ${demo.name}, { previewerProps as ${demo.name}PreviewerProps } from '${request}'`;
-      })
-      .join('\n')}
-    const ReactComponent = ${compiledReactCode}
-  `);
+  // compiledReactCode = compiledReactCode.replaceAll('\\\\n', '\\n');
+  const mdJsx = `
+  import React from "react"\n
+  ${demos
+    .map(demo => {
+      const request = `${slash(id)}.${demo.name}.${demo.language || 'jsx'}`;
+      demo.id = request;
+      return `import ${demo.name}, { previewerProps as ${demo.name}PreviewerProps } from '\0${request}'`;
+    })
+    .join('\n')}
+  const ReactComponent = ${compiledReactCode}
+`;
+  const mdJsxResult = await reactBabelPlugin.transform(mdJsx, `\0${id}.tsx`);
+  content.addContext(mdJsxResult.code.replaceAll('\\\\n', '\\n'));
   content.addExporting('ReactComponent');
 
   let exportDemos = '';
@@ -84,6 +81,8 @@ function markdownToDoc(code, id) {
     exportDemos += `${el.name},`;
     if (i === demos.length - 1) exportDemos += ']';
   });
+
+  if (!exportDemos) exportDemos = '[]';
 
   content.addContext(`const DemoBlocks = ${exportDemos}`);
   content.addExporting('DemoBlocks');
@@ -101,6 +100,7 @@ const importedIdSet: Map<string, string> = new Map();
 
 export const plugin = (): Plugin => {
   let server: ViteDevServer;
+  let reactBabelPlugin: Plugin;
 
   return {
     name: 'vite-plugin-mdoc',
@@ -108,6 +108,7 @@ export const plugin = (): Plugin => {
     configResolved(resolvedConfig) {
       // store the resolved config
       config = resolvedConfig;
+      reactBabelPlugin = resolvedConfig.plugins.find(el => el.name === 'vite:react-babel');
     },
     configureServer(_server) {
       server = _server;
@@ -136,10 +137,12 @@ export const plugin = (): Plugin => {
         const demo = demoBlocks?.[+index - 1];
 
         if (demo.filePath) {
-          return `import ${demo.name}, { codeStr } from '${demo.filePath}';\nexport default ${demo.name};\nexport const previewerProps = { code: codeStr, language: '${demo.language}', title: '${demo.title}' }`;
+          return `import ${demo.name}, { codeStr } from '${demo.filePath}';\nexport default ${demo.name};\nexport const previewerProps = { code: codeStr, language: '${demo.language}', title: '${demo.title}', dependencies: ${JSON.stringify(demo.dependencies)} }`;
         }
 
-        return `${demo.code};\nexport const previewerProps = {code: ${JSON.stringify(demo.code)}, language: '${demo.language}', title: '${demo.title}'}`;
+        return `${demo.code};\nexport const previewerProps = {code: ${JSON.stringify(
+          demo.code,
+        )}, language: '${demo.language}', title: '${demo.title}', dependencies: ${JSON.stringify(demo.dependencies)} }`;
       }
 
       if (importedIdSet.has(id)) {
@@ -149,28 +152,27 @@ export const plugin = (): Plugin => {
     },
     async transform(code, id) {
       if (id.endsWith('.md')) {
-        const { code: content, demos } = markdownToDoc(code, id);
+        const { code: content, demos } = await markdownToDoc(code, id, reactBabelPlugin);
         cache.set(id, demos);
         demos.forEach(demo => {
           if (demo.filePath) {
             importedIdSet.set(demo.filePath, id);
           }
         });
+
         return { code: content };
       }
     },
     async handleHotUpdate(ctx) {
       if (ctx.file.endsWith('.md')) {
         const source = await ctx.read();
-        const { demos } = markdownToDoc(source, ctx.file);
+        const { demos } = await markdownToDoc(source, ctx.file, reactBabelPlugin);
         cache.set(ctx.file, demos);
         const updateModules: ModuleNode[] = [];
-
         demos.forEach(demo => {
           const mods = server.moduleGraph.getModulesByFile(demo.id) || [];
           updateModules.push(...mods);
         });
-
         return [...updateModules];
       }
     },

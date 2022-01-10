@@ -1,6 +1,5 @@
-import { lazy, Suspense } from 'react';
-import Highlight, { defaultProps } from 'prism-react-renderer';
-import type { Language } from 'prism-react-renderer';
+import { Suspense } from 'react';
+import MdPreviewer from './components/MdPreviewer';
 import { ReactComponent, DemoBlocks } from './test.md';
 import './App.css';
 
@@ -23,21 +22,8 @@ function App() {
         <header className="App-header">
           <ReactComponent
             previewer={props => {
-              return (
-                <Highlight {...defaultProps} code={props.code} language={props.language as Language}>
-                  {({ className, style, tokens, getLineProps, getTokenProps }) => (
-                    <pre className={className} style={style}>
-                      {tokens.map((line, i) => (
-                        <div {...getLineProps({ line, key: i })}>
-                          {line.map((token, key) => (
-                            <span {...getTokenProps({ token, key })} />
-                          ))}
-                        </div>
-                      ))}
-                    </pre>
-                  )}
-                </Highlight>
-              );
+              console.log(props)
+              return <MdPreviewer {...props} />
             }}
           />
         </header>

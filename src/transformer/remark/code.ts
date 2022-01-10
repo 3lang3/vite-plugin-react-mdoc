@@ -24,25 +24,14 @@ import type { IDumiUnifiedTransformer } from '.';
         const parsedAttrs = parseElmAttrToProps(attrs as any);
 
         try {
-          // props.filePath = getModuleResolvePath({
-          //   basePath: this.data('fileAbsPath'),
-          //   sourcePath: src,
-          //   // allow set unresolved src then resolve by custom transformer
-          //   silent: hasCustomTransformer,
-          //   // allow ts/js demo if there has custom compiletime transformer
-          //   ...(hasCustomTransformer ? {} : { extensions: ['.tsx', '.jsx'] }),
-          // });
           props.source = fs.readFileSync(props.filePath, 'utf8').toString();
           props.lang = path.extname(props.filePath).slice(1);
         } catch (err) {
           /* istanbul ignore next */
-          // if (!hasCustomTransformer) {
-          //   throw err;
-          // }
         }
-
+        parent.tagName = 'div'
         // replace original node
-        parent.children.splice(index, 1, {
+        parent.children.splice(0, 1, {
           type: 'element',
           tagName: 'div',
           position: node.position,
