@@ -1,12 +1,12 @@
 import { Suspense } from 'react';
 import MdPreviewer from './components/MdPreviewer';
-import { ReactComponent, DemoBlocks } from './test.md';
+import { MdContent, MdDemos } from './test.md';
 import './App.css';
 
 const DemoRender = () => {
   return (
     <div className="demo">
-      {DemoBlocks.map((Com, i) => (
+      {MdDemos.map((Com, i) => (
         <div key={i}>
           <Com />
         </div>
@@ -20,7 +20,7 @@ function App() {
     <Suspense fallback={<div>loading...</div>}>
       <div className="App">
         <header className="App-header">
-          <ReactComponent
+          <MdContent
             previewer={props => {
               console.log(props)
               return <MdPreviewer {...props} />

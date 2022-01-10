@@ -68,11 +68,11 @@ async function markdownToDoc(code, id, reactBabelPlugin) {
       return `import ${demo.name}, { previewerProps as ${demo.name}PreviewerProps } from '\0${request}'`;
     })
     .join('\n')}
-  const ReactComponent = ${compiledReactCode}
+  const MdContent = ${compiledReactCode}
 `;
   const mdJsxResult = await reactBabelPlugin.transform(mdJsx, `\0${id}.tsx`);
   content.addContext(mdJsxResult.code.replaceAll('\\\\n', '\\n'));
-  content.addExporting('ReactComponent');
+  content.addExporting('MdContent');
 
   let exportDemos = '';
 
@@ -84,8 +84,8 @@ async function markdownToDoc(code, id, reactBabelPlugin) {
 
   if (!exportDemos) exportDemos = '[]';
 
-  content.addContext(`const DemoBlocks = ${exportDemos}`);
-  content.addExporting('DemoBlocks');
+  content.addContext(`const MdDemos = ${exportDemos}`);
+  content.addExporting('MdDemos');
 
   return {
     code: content.export(),

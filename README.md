@@ -5,13 +5,13 @@ A plugin enables you to import a Markdown file as various formats on your [vite]
 ## Setup
 
 ```
-npm i -D vite-plugin-mdoc
+npm i -D vite-plugin-react-mdoc
 ```
 
 ### Config
 
 ```js
-const mdoc = require('vite-plugin-mdoc')
+const mdoc = require('vite-plugin-react-mdoc')
 
 module.exports = {
   plugins: [mdoc(options)]
@@ -36,9 +36,7 @@ Vite is an opinionated web dev build tool that serves your code via native ES Mo
 ```
 
 ```ts
-import { attributes } from './contents/the-doc.md';
-
-console.log(attributes) //=> { title: 'Awesome Title', description: 'Describe this awesome content', tags: ['great', 'awesome', 'rad'] }
+import { MdContent, MdDemos } from './doc.md';
 ```
 ### Type declarations
 
@@ -48,11 +46,11 @@ In TypeScript project, need to declare typedefs for `.md` file as you need.
 declare module '*.md' {
   // When "Mode.React" is requested. VFC could take a generic like React.VFC<{ MyComponent: TypeOfMyComponent }>
   import React from 'react'
-  const ReactComponent: React.VFC;
-  const DemoBlocks: React.VFC[];
+  const MdContent: React.VFC;
+  const MdDemos: React.VFC[];
 
   // Modify below per your usage
-  export { ReactComponent, DemoBlocks, };
+  export { MdContent, MdDemos, };
 }
 ```
 
