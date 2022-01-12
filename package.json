@@ -39,7 +39,7 @@
     "front-matter": "^4.0.0",
     "hast-util-has-property": "^1.0.4",
     "hast-util-is-element": "^1.1.0",
-    "hast-util-raw": "^6.0.0",
+    "hast-util-raw": "^7.0.0",
     "hast-util-to-html": "^7.1.1",
     "hast-util-to-string": "^1.0.2",
     "js-yaml": "^4.1.0",
