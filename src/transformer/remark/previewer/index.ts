@@ -3,7 +3,7 @@ import path from 'path';
 import type { Node } from 'unist';
 import visit from 'unist-util-visit';
 import slash from 'slash2';
-import demoTransformer, { DEMO_COMPONENT_NAME } from '../../demo';
+import { DEMO_COMPONENT_NAME } from '../../demo';
 import transformer from '../..';
 import { decodeHoistImportToContent } from '../../utils';
 import builtinTransformer from './builtin';
@@ -12,14 +12,6 @@ import type { IPreviewerTransformer, IPreviewerTransformerResult } from './built
 
 export const previewerTransforms: IPreviewerTransformer[] = [builtinTransformer];
 
-/**
- * cache id for each external demo file
- */
-const externalCache = new Map<string, string>();
-/**
- * record external demo id count
- */
-const externalIdMap = new Map<string, number>();
 /**
  * record code block demo id count
  */

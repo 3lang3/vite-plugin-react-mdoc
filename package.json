@@ -1,15 +1,15 @@
 {
   "name": "vite-plugin-react-mdoc",
-  "version": "0.0.1-dev",
-  "description": "Import markdown files in vite and get code",
+  "version": "0.0.0-dev.1",
+  "description": "Import markdown files and get coode in vite",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "files": [
     "dist"
   ],
   "scripts": {
-    "dev": "npm run build -- --watch",
-    "build": "tsup-node src/index.ts --format cjs,esm",
+    "dev": "tsc -w -p .",
+    "build": "tsc -p .",
     "lint": "eslint . --ext .ts"
   },
   "keywords": [
@@ -21,20 +21,20 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/3lang3/vite-plugin-mdoc.git"
+    "url": "git+https://github.com/3lang3/vite-plugin-react-mdoc.git"
   },
   "bugs": {
-    "url": "https://github.com/3lang3/vite-plugin-mdoc/issues"
+    "url": "https://github.com/3lang3/vite-plugin-react-mdoc/issues"
   },
-  "homepage": "https://github.com/3lang3/vite-plugin-mdoc/tree/main/#readme",
+  "homepage": "https://github.com/3lang3/vite-plugin-react-mdoc/tree/main/#readme",
   "dependencies": {
     "@babel/core": "^7.16.5",
+    "@babel/generator": "^7.16.8",
     "@babel/preset-react": "^7.16.5",
     "@babel/traverse": "^7.16.5",
     "@babel/types": "^7.16.0",
     "@mapbox/hast-util-to-jsx": "^2.0.0",
-    "debug": "^4.3.3",
-    "domhandler": "^4.3.0",
+    "@rollup/pluginutils": "^4.1.2",
     "enhanced-resolve": "^5.8.3",
     "front-matter": "^4.0.0",
     "hast-util-has-property": "^1.0.4",
@@ -53,8 +53,7 @@
     "remark-stringify": "^9.0.0",
     "slash2": "^2.0.0",
     "unified": "^8.4.1",
-    "unist-util-visit": "^2.0.1",
-    "vfile-reporter": "^7.0.3"
+    "unist-util-visit": "^2.0.1"
   },
   "peerDependencies": {
     "vite": "^2.0.0"

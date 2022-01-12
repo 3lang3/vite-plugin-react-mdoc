@@ -25,7 +25,7 @@ function codeBlockModifierParser(meta: string): Record<string, any> {
 export default function codeBlock(): IDumiUnifiedTransformer {
   return (ast: any) => {
     // handle md code block syntax
-    visit(ast, 'code', node => {
+    visit(ast, 'code', (node: any) => {
       const modifier = codeBlockModifierParser(node.meta);
       // extract frontmatters for embedded demo
       const { content, meta } = transformer.code(winEOL(node.value));

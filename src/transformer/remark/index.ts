@@ -1,5 +1,3 @@
-import path from 'path';
-import createDebug from 'debug';
 import type { Transformer } from 'unified';
 import type { Node } from 'unist';
 import unified from 'unified';
@@ -16,17 +14,6 @@ import sourceCode from './sourceCode';
 import codeBlock from './codeBlock';
 import previewer from './previewer';
 
-const log = createDebug('remark');
-
-function debug(name: string) {
-  return function debugPlugin() {
-    return () => {
-      if (this.data('fileAbsPath')) {
-        log(name, this.data('fileAbsPath'));
-      }
-    };
-  };
-}
 
 export default (source: string, fileAbsPath: string, type: 'jsx' | 'html', masterKey?: string) => {
   const rehypeCompiler = {
@@ -36,34 +23,21 @@ export default (source: string, fileAbsPath: string, type: 'jsx' | 'html', maste
 
   const processor = unified()
     .use(remarkParse)
-    .use(debug('parse'))
     .use(remarkGfm)
-    .use(debug('gfm'))
     .use(remarkFrontmatter)
-    .use(debug('frontmatter'))
     .use(meta)
-    .use(debug('meta'))
     .use(codeBlock)
-    .use(debug('codeBlock'))
     .use(rehype)
-    .use(debug('rehype'))
     .use(sourceCode)
-    .use(debug('sourceCode'))
     .use(raw)
-    .use(debug('raw'))
     .use(code)
-    .use(debug('code'))
     .use(previewer)
-    .use(debug('previewer'))
     .data('masterKey', masterKey)
     .data('fileAbsPath', fileAbsPath)
 
   // apply compiler via type
   processor.use(rehypeCompiler[0], rehypeCompiler[1]);
   const file = processor.processSync(source);
-
-  file.path = path.dirname(path.join(__dirname, 'src'));
-  file.extname = '.tsx';
 
   return file as any;
 };

@@ -49,7 +49,7 @@ export default (): IDumiUnifiedTransformer => ast => {
   const parsed = raw(ast as any);
 
   // restore React Component & it's properties
-  visit(parsed, 'element', elm => {
+  visit(parsed, 'element', (elm: any) => {
     // restore tag name
     if (/^dumi-raw/.test(elm.tagName)) {
       elm.tagName = elm.tagName

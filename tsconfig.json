@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "moduleResolution": "Node",
+    "target": "ES2017",
+    "sourceMap": false,
+    "moduleResolution": "node",
     "noImplicitAny": false,
     "declaration": true,
     "noUnusedLocals": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "outDir": "dist",
-    "module": "ESNext",
-    "lib": ["ESNext", "DOM"],
-    "sourceMap": true
+    "module": "CommonJS",
+    "lib": ["ESNext"]
   },
   "include": ["./src"],
   "exclude": [

@@ -8,7 +8,7 @@ export default () => {
   return (
     <>
       <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_632/274faa127009547.61390144590a7.png" />
-      <button className="less_btn" onClick={() => setCount(v => v + 1)}>31: {count}</button>
+      <button className="less_btn" onClick={() => setCount(v => v + 1)}>3111: {count}</button>
     </>
   );
 };
