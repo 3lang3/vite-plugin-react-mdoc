@@ -95,6 +95,7 @@ function analyzeDeps(
             sourcePath: requireStr,
             extensions: LOCAL_MODULE_EXT,
           });
+
           const resolvePathParsed = path.parse(resolvePath);
           if (resolvePath.includes('node_modules')) {
             // save external deps
@@ -109,7 +110,6 @@ function analyzeDeps(
             // process peer dependencies from dependency
             Object.keys(pkg.peerDependencies || {}).forEach(dep => {
               const peerCSS = getCSSForDep(dep);
-
               peerDeps.push({
                 name: dep,
                 version: pkg.peerDependencies[dep],

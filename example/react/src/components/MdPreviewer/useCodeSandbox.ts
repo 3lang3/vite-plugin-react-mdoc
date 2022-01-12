@@ -82,7 +82,8 @@ function getCSBData(opts: IPreviewerComponentProps) {
   files['sandbox.config.json'] = {
     content: JSON.stringify(
       {
-        template: isTSX ? 'create-react-app-typescript' : 'create-react-app',
+        // template: isTSX ? 'create-react-app-typescript' : 'create-react-app',
+        template: 'create-react-app',
       },
       null,
       2,
@@ -129,12 +130,15 @@ ReactDOM.render(
   };
 
   // append other imported local files
-  Object.entries(opts.dependencies).forEach(([filename, { value }]) => {
+  Object.entries(opts.dependencies).forEach(([filename, { value, type  }]) => {
+    if (type !== 'FILE') return;
     // handle primary content
     files[filename.startsWith('index') ? appFileName : filename] = {
       content: value,
     };
   });
+
+  console.log(files)
 
   return serialize({ files });
 }

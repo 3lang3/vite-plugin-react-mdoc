@@ -4,7 +4,8 @@ import slash from 'slash2';
 import { ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite';
 import transformer from './transformer';
 
-const debug = require('debug')('vite:mdoc:plugin');
+const PLUGIN_NAME = 'vite-plugin-react-mdoc';
+const FILE_PATH_EXPORT_NAME = '___vitePluginReactMdocCodestring___';
 
 type DemoType = {
   id: string;
@@ -58,14 +59,14 @@ async function markdownToDoc(code, id, reactBabelPlugin) {
         </div>
       }
     `;
-  // compiledReactCode = compiledReactCode.replaceAll('\\\\n', '\\n');
+
   const mdJsx = `
   import React from "react"\n
   ${demos
     .map(demo => {
       const request = `${slash(id)}.${demo.name}.${demo.language || 'jsx'}`;
       demo.id = request;
-      return `import ${demo.name}, { previewerProps as ${demo.name}PreviewerProps } from '\0${request}'`;
+      return `import ${demo.name}, { previewerProps as ${demo.name}PreviewerProps } from '${request}'`;
     })
     .join('\n')}
   const MdContent = ${compiledReactCode}
@@ -75,13 +76,11 @@ async function markdownToDoc(code, id, reactBabelPlugin) {
   content.addExporting('MdContent');
 
   let exportDemos = '';
-
   demos.forEach((el, i) => {
     if (i === 0) exportDemos += '[';
     exportDemos += `${el.name},`;
     if (i === demos.length - 1) exportDemos += ']';
   });
-
   if (!exportDemos) exportDemos = '[]';
 
   content.addContext(`const MdDemos = ${exportDemos}`);
@@ -103,8 +102,7 @@ export const plugin = (): Plugin => {
   let reactBabelPlugin: Plugin;
 
   return {
-    name: 'vite-plugin-mdoc',
-    enforce: 'pre',
+    name: PLUGIN_NAME,
     configResolved(resolvedConfig) {
       // store the resolved config
       config = resolvedConfig;
@@ -117,8 +115,7 @@ export const plugin = (): Plugin => {
       if (/\.md\.VDOCDemo(\d+)\.(j|t)sx$/.test(id)) {
         const idPath: string = id.startsWith(config.root + '/')
           ? id
-          : path.join(config.root, id.substr(1));
-        debug('resolve demo:', idPath);
+          : path.join(config.root, id.substring(1));
         return idPath;
       }
     },
@@ -126,28 +123,40 @@ export const plugin = (): Plugin => {
       const mat = id.match(/\.md\.VDOCDemo(\d+)\.(jsx|tsx)$/);
       if (mat && mat.length >= 2) {
         const [, index, suffix] = mat;
-        debug(`load:${id} ${index}`);
         const mdFileName = id.replace(`.VDOCDemo${index}.${suffix}`, '');
         const mdFilePath = mdFileName.startsWith(config.root + '/')
           ? mdFileName
-          : path.join(config.root, mdFileName.substr(1));
+          : path.join(config.root, mdFileName.substring(1));
 
         const demoBlocks = cache.get(mdFilePath);
-
         const demo = demoBlocks?.[+index - 1];
 
         if (demo.filePath) {
-          return `import ${demo.name}, { codeStr } from '${demo.filePath}';\nexport default ${demo.name};\nexport const previewerProps = { code: codeStr, language: '${demo.language}', title: '${demo.title}', dependencies: ${JSON.stringify(demo.dependencies)} }`;
+          return {
+            code: `import ${demo.name}, { ${FILE_PATH_EXPORT_NAME} } from '${
+              demo.filePath
+            }';\nexport default ${
+              demo.name
+            };\nexport const previewerProps = { code: ${FILE_PATH_EXPORT_NAME}, language: '${
+              demo.language
+            }', title: '${demo.title}', dependencies: ${JSON.stringify(demo.dependencies)} }`,
+            map: { mappings: '' },
+          };
         }
 
-        return `${demo.code};\nexport const previewerProps = {code: ${JSON.stringify(
-          demo.code,
-        )}, language: '${demo.language}', title: '${demo.title}', dependencies: ${JSON.stringify(demo.dependencies)} }`;
+        return {
+          code: `${demo.code};\nexport const previewerProps = {code: ${JSON.stringify(
+            demo.code,
+          )}, language: '${demo.language}', title: '${demo.title}', dependencies: ${JSON.stringify(
+            demo.dependencies,
+          )} }`,
+          map: { mappings: '' },
+        };
       }
 
       if (importedIdSet.has(id)) {
         const idSource = fs.readFileSync(id, 'utf8');
-        return `${idSource}\n export const codeStr = ${JSON.stringify(idSource)}`;
+        return `${idSource}\n export const ${FILE_PATH_EXPORT_NAME} = ${JSON.stringify(idSource)}`;
       }
     },
     async transform(code, id) {
@@ -170,6 +179,7 @@ export const plugin = (): Plugin => {
         cache.set(ctx.file, demos);
         const updateModules: ModuleNode[] = [];
         demos.forEach(demo => {
+          if (demo.filePath) return;
           const mods = server.moduleGraph.getModulesByFile(demo.id) || [];
           updateModules.push(...mods);
         });

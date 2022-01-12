@@ -177,8 +177,6 @@ const visitor = function (node, i, parent) {
 
         // export result
         ({ previewerProps } = decorateResult(result));
-
-        console.log(previewerProps.dependencies)
       }
       // use the first valid result
       return result;

@@ -5,9 +5,10 @@ import useCopy from './useCopy';
 import csbIcon from './csb.svg';
 import copyIcon from './copy.svg';
 import './index.less';
+import 'prismjs/themes/prism.css';
 
 const DefaultRender = props => (
-  <Highlight {...defaultProps} code={props.code} language={props.language as Language}>
+  <Highlight {...defaultProps} code={props.code} language={props.language as Language} theme={undefined}>
     {({ className, style, tokens, getLineProps, getTokenProps }) => (
       <pre className={className} style={style}>
         {tokens.map((line, i) => (
@@ -39,7 +40,7 @@ const ActionsRender = props => {
 };
 
 export default props => {
-  return /(t|j)sx/.test(props.language) ? (
+  return props.dependencies  ? (
     <ActionsRender {...props} />
   ) : (
     <DefaultRender {...props} />

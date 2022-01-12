@@ -16,9 +16,7 @@ import sourceCode from './sourceCode';
 import codeBlock from './codeBlock';
 import previewer from './previewer';
 
-const log = createDebug('dumi:remark');
-
-log('name');
+const log = createDebug('remark');
 
 function debug(name: string) {
   return function debugPlugin() {
