@@ -1,6 +1,6 @@
 # vite-plugin-mdoc
 
-A plugin enables you to import a Markdown file as various formats on your [vite](https://github.com/vitejs/vite) project.
+A plugin enables you to import a Markdown file as various formats on your [vite](https://github.com/vitejs/vite) project inspirt by [dumi](https://github.com/umijs/dumi).
 
 ## Setup
 
@@ -11,33 +11,34 @@ npm i -D vite-plugin-react-mdoc
 ### Config
 
 ```js
-const mdoc = require('vite-plugin-react-mdoc')
+const mdoc = require('vite-plugin-react-mdoc');
 
 module.exports = {
-  plugins: [mdoc(options)]
-}
+  plugins: [mdoc(options)],
+};
 ```
 
 Then you can import front matter attributes from `.md` file as default.
 
-```md
----
-title: Awesome Title
-description: Describe this awesome content
-tags:
-  - "great"
-  - "awesome"
-  - "rad"
----
+````md
+# Hello world
 
-# This is awesome
+```tsx
+import React from 'react';
 
-Vite is an opinionated web dev build tool that serves your code via native ES Module imports during dev and bundles it with Rollup for production.
+export default () => {
+  const [count, setCount] = React.useState(0);
+  return <button onClick={() => setCount(v => v + 1)}>count: {count}</button>;
+};
 ```
 
-```ts
+````
+
+
+```tsx
 import { MdContent, MdDemos } from './doc.md';
-```
+````
+
 ### Type declarations
 
 In TypeScript project, need to declare typedefs for `.md` file as you need.
@@ -45,12 +46,26 @@ In TypeScript project, need to declare typedefs for `.md` file as you need.
 ```ts
 declare module '*.md' {
   // When "Mode.React" is requested. VFC could take a generic like React.VFC<{ MyComponent: TypeOfMyComponent }>
-  import React from 'react'
-  const MdContent: React.VFC;
-  const MdDemos: React.VFC[];
+  import React from 'react';
+  const MdContent: React.VFC<{
+    previewer: (props: {
+      code: string;
+      language: string;
+      title?: string;
+      dependencies: Record<
+        string,
+        {
+          type: string;
+          value: string;
+          css: boolean;
+        }
+      >;
+    }) => React.ReactNode;
+  }>;
+  const MdDemos: { Component: React.VFC; title?: string; id: string }[];
 
   // Modify below per your usage
-  export { MdContent, MdDemos, };
+  export { MdContent, MdDemos };
 }
 ```
 

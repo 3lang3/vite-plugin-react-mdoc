@@ -55,7 +55,9 @@ export async function markdownToDoc(code: string, id: string, reactBabelPlugin) 
   let exportDemos = '';
   demos.forEach((el, i) => {
     if (i === 0) exportDemos += '[';
-    exportDemos += `${el.name},`;
+    exportDemos += `{ Component: ${el.name}, id: '${el.id}',`;
+    if (el.title) exportDemos += `title: '${el.title}',`;
+    exportDemos += '},';
     if (i === demos.length - 1) exportDemos += ']';
   });
   if (!exportDemos) exportDemos = '[]';

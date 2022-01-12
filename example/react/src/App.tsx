@@ -6,9 +6,10 @@ import './App.css';
 const DemoRender = () => {
   return (
     <div className="demo">
-      {MdDemos.map((Com, i) => (
-        <div key={i}>
-          <Com />
+      {MdDemos.map((Demo) => (
+        <div key={Demo.id}>
+          <h4>{Demo.title}</h4>
+          <Demo.Component />
         </div>
       ))}
     </div>

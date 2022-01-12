@@ -1,6 +1,7 @@
 import remark from './remark';
 import FileCache from '../utils/cache';
 import yaml from '../utils/yaml';
+import type { DemoType } from '../types';
 
 export interface TransformResult {
   content: string;
@@ -18,7 +19,7 @@ export default {
    * @param fileAbsPath source file path
    * @param opts        transform options
    */
-   markdown(
+  markdown(
     raw: string,
     fileAbsPath: string,
     {
@@ -32,7 +33,7 @@ export default {
       throwError?: boolean;
       masterKey?: string;
     } = {},
-  ) {
+  ): { contents: string; data: { demos: DemoType[] } } & Record<string, any> {
     // use cache first
     let result = cacheKey && cachers.markdown.get(cacheKey);
 
@@ -40,7 +41,7 @@ export default {
       try {
         result = { value: remark(raw, fileAbsPath, type, masterKey) };
       } catch (error) {
-        console.log('[transformer.markdown error]', error)
+        console.log('[transformer.markdown error]', error);
         // return empty result & cache error
         result = { value: { contents: '', data: {} }, error };
       } finally {
@@ -55,7 +56,7 @@ export default {
       throw result.error;
     }
 
-    return result.value
+    return result.value;
   },
   /**
    * split frontmatters & content for code block
