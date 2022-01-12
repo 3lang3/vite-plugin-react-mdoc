@@ -77,11 +77,15 @@ function analyzeDeps(
   if (!cache) {
     cache = { dependencies: [], files: [] };
     // support to pass babel transform result directly
-    
-    const { ast } = transformSync(
-      raw,
-      getBabelOptions({ isTSX, fileAbsPath, transformRuntime: false }),
-    );
+    let ast: any;
+    try {
+      ast = transformSync(
+        raw,
+        getBabelOptions({ isTSX, fileAbsPath, transformRuntime: false }),
+      ).ast;
+    } catch (err) {
+      //
+    }
 
     // traverse all require call expression
     traverse(ast, {

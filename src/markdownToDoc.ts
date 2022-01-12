@@ -48,7 +48,13 @@ export async function markdownToDoc(code: string, id: string, reactBabelPlugin) 
     .join('\n')}
   const MdContent = ${compiledReactCode}
 `;
-  const mdJsxResult = await reactBabelPlugin.transform(mdJsx, `\0${id}.tsx`);
+
+  let mdJsxResult = {  code: '' }
+  try {
+    mdJsxResult = await reactBabelPlugin.transform(mdJsx, `\0${id}.tsx`);
+  } catch (e) {
+    // 
+  }
   content.addContext(mdJsxResult.code.replaceAll('\\\\n', '\\n'));
   content.addExporting('MdContent');
 

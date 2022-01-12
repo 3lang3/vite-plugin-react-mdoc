@@ -13,7 +13,7 @@ let config: ResolvedConfig;
 const cache: Map<string, DemoType[]> = new Map();
 const importedIdSet: Map<string, string> = new Map();
 
-export const plugin = (userOptions: Options = {}): Plugin => {
+const plugin = (userOptions: Options = {}): Plugin => {
   let server: ViteDevServer;
   let reactBabelPlugin: Plugin;
 
@@ -51,6 +51,8 @@ export const plugin = (userOptions: Options = {}): Plugin => {
 
         const demoBlocks = cache.get(mdFilePath);
         const demo = demoBlocks?.[+index - 1];
+
+        if (!demo) return null
 
         if (demo.filePath) {
           return {
