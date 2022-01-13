@@ -1,6 +1,6 @@
 import fs from 'fs';
-import { createFilter } from '@rollup/pluginutils'
 import path from 'path';
+import { createFilter } from '@rollup/pluginutils'
 import { ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite';
 import type { DemoType, Options } from './types';
 import { markdownToDoc } from './markdownToDoc';
@@ -33,24 +33,24 @@ const plugin = (userOptions: Options = {}): Plugin => {
       server = _server;
     },
     resolveId(id) {
-      if (/\.md\.VDOCDemo(\d+)\.(j|t)sx$/.test(id)) {
-        const idPath: string = id.startsWith(config.root + '/')
+      const mat = id.match(/\.md\.VDOCDemo\d+\.(.*)\.(jsx|tsx)$/);
+      if (mat && mat.length > 2) {
+        const [, sourceIdBase64] = mat
+        const sourceId = Buffer.from(sourceIdBase64, 'base64').toString('ascii')
+        const idPath: string = id.startsWith(sourceId)
           ? id
           : path.join(config.root, id.substring(1));
         return idPath;
       }
     },
     load(id) {
-      const mat = id.match(/\.md\.VDOCDemo(\d+)\.(jsx|tsx)$/);
+      const mat = id.match(/\.md\.VDOCDemo(\d+)(\..*)\.(jsx|tsx)$/);
       if (mat && mat.length >= 2) {
-        const [, index, suffix] = mat;
+        const [, index, sourceId, suffix] = mat;
+        id = id.replace(sourceId, '');
         const mdFileName = id.replace(`.VDOCDemo${index}.${suffix}`, '');
-        const mdFilePath = mdFileName.startsWith(config.root + '/')
-          ? mdFileName
-          : path.join(config.root, mdFileName.substring(1));
-
-        const demoBlocks = cache.get(mdFilePath);
-        const demo = demoBlocks?.[+index - 1];
+        const demos = cache.get(mdFileName);
+        const demo = demos?.[+index - 1];
 
         if (!demo) return null
 

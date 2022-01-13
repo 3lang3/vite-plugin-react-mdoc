@@ -20,7 +20,6 @@ class ExportedContent {
 
 export async function markdownToDoc(code: string, id: string, reactBabelPlugin) {
   const content = new ExportedContent();
-
   const rs = transformer.markdown(code, id);
   const {
     data: { demos = [] },
@@ -41,14 +40,13 @@ export async function markdownToDoc(code: string, id: string, reactBabelPlugin) 
   import React from "react"\n
   ${demos
     .map(demo => {
-      const request = `${slash(id)}.${demo.name}.${demo.language || 'jsx'}`;
+      const request = `${slash(id)}.${demo.name}.${Buffer.from(id).toString('base64')}.${demo.language || 'jsx'}`;
       demo.id = request;
       return `import ${demo.name}, { previewerProps as ${demo.name}PreviewerProps } from '${request}'`;
     })
     .join('\n')}
   const MdContent = ${compiledReactCode}
 `;
-
   let mdJsxResult = {  code: '' }
   try {
     mdJsxResult = await reactBabelPlugin.transform(mdJsx, `\0${id}.tsx`);
