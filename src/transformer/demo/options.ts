@@ -1,4 +1,3 @@
-
 export interface IDemoOpts {
   isTSX: boolean;
   fileAbsPath: string;
@@ -8,7 +7,7 @@ export interface IDemoOpts {
 export const getBabelOptions = ({ isTSX, fileAbsPath, transformRuntime }: IDemoOpts) => ({
   // rename filename.md to filename.tsx to prevent babel transform failed
   filename: fileAbsPath.replace(/\.md$/, isTSX ? '.tsx' : '.jsx'),
-  presets: ['@babel/preset-react'],
+  presets: [require.resolve('@babel/preset-react')],
   // plugins: [
   //   [require.resolve('@babel/plugin-transform-modules-commonjs'), { strict: true }],
   // ],

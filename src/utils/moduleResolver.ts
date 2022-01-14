@@ -12,6 +12,7 @@ interface IModuleResolverOpts {
   sourcePath: string;
   extensions?: string[];
   silent?: boolean;
+  viteConfig?: any;
 }
 
 /**
@@ -53,6 +54,7 @@ export const getModuleResolvePath = ({
   sourcePath,
   extensions = DEFAULT_EXT,
   silent,
+  viteConfig,
 }: IModuleResolverOpts) => {
   // treat local packages as 3rd-party module for collect as dependencies
   if (/^[a-z]@/.test(sourcePath) && getHostPkgPath(getPkgPathsFromPath(sourcePath).pkgName)) {
@@ -60,10 +62,11 @@ export const getModuleResolvePath = ({
   }
 
   try {
+    console.log(viteConfig?.resolve?.alias)
     return slash(
       resolve.create.sync({
         extensions,
-        alias: ctx.umi?.config?.alias,
+        alias: viteConfig?.resolve?.alias,
         symlinks: false,
         mainFiles: ['index', 'package.json'],
       })(fs.statSync(basePath).isDirectory() ? basePath : path.parse(basePath).dir, sourcePath),

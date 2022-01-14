@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { createFilter } from '@rollup/pluginutils'
+import { createFilter } from '@rollup/pluginutils';
 import { ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite';
 import type { DemoType, Options } from './types';
 import { markdownToDoc } from './markdownToDoc';
@@ -17,16 +17,13 @@ const plugin = (userOptions: Options = {}): Plugin => {
   let server: ViteDevServer;
   let reactBabelPlugin: Plugin;
 
-  const filter = createFilter(
-    userOptions.include || /\.md$/,
-    userOptions.exclude,
-  )
+  const filter = createFilter(userOptions.include || /\.md$/, userOptions.exclude);
 
   return {
     name: PLUGIN_NAME,
     configResolved(resolvedConfig) {
       // store the resolved config
-      config = resolvedConfig;
+      config = { ...resolvedConfig, root: userOptions?.root || resolvedConfig.root };
       reactBabelPlugin = resolvedConfig.plugins.find(el => el.name === 'vite:react-babel');
     },
     configureServer(_server) {
@@ -35,8 +32,8 @@ const plugin = (userOptions: Options = {}): Plugin => {
     resolveId(id) {
       const mat = id.match(/\.md\.VDOCDemo\d+\.(.*)\.(jsx|tsx)$/);
       if (mat && mat.length > 2) {
-        const [, sourceIdBase64] = mat
-        const sourceId = Buffer.from(sourceIdBase64, 'base64').toString('ascii')
+        const [, sourceIdBase64] = mat;
+        const sourceId = Buffer.from(sourceIdBase64, 'base64').toString('ascii');
         const idPath: string = id.startsWith(sourceId)
           ? id
           : path.join(config.root, id.substring(1));
@@ -52,7 +49,7 @@ const plugin = (userOptions: Options = {}): Plugin => {
         const demos = cache.get(mdFileName);
         const demo = demos?.[+index - 1];
 
-        if (!demo) return null
+        if (!demo) return null;
 
         if (demo.filePath) {
           return {

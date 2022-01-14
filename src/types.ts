@@ -1,15 +1,15 @@
 /* eslint-disable no-use-before-define */
-import type { FilterPattern } from '@rollup/pluginutils'
+import type { FilterPattern } from '@rollup/pluginutils';
 
 export interface Options {
-  include?: FilterPattern
-  exclude?: FilterPattern
+  include?: FilterPattern;
+  exclude?: FilterPattern;
+  root?: string;
 }
 
 export interface ResolvedOptions extends Required<Options> {
-  wrapperClasses: string
+  wrapperClasses: string;
 }
-
 
 export type DemoType = {
   id: string;

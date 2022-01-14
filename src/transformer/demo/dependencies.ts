@@ -96,15 +96,13 @@ function analyzeDeps(
         // tranverse all require statement
         if (t.isProgram(callPath.parent)) {
           const requireStr = callPathNode.source.value;
-          
           const resolvePath = getModuleResolvePath({
             // basePath: fileAbsPath,
             basePath: fileAbsPath.startsWith(viteConfig.root) ? fileAbsPath : viteConfig.root,
             sourcePath: requireStr,
             extensions: LOCAL_MODULE_EXT,
+            viteConfig,
           });
-
-          // console.log(requireStr, fileAbsPath, resolvePath)
 
           const resolvePathParsed = path.parse(resolvePath);
           if (resolvePath.includes('node_modules')) {
