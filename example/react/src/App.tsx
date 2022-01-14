@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import MdPreviewer from './components/MdPreviewer';
-// import { MdContent, MdDemos } from './test.md';
-import { MdContent, MdDemos } from '/Users/3lang/Workspace/zhp/react-vant/packages/react-vant/docs/markdown/advanced-usage.zh-CN.md';
+import { MdContent, MdDemos } from './test.md';
+// import { MdContent, MdDemos } from '/Users/3lang/Workspace/github/react-vant/packages/react-vant/docs/markdown/advanced-usage.zh-CN.md';
 import './App.css';
 
 const DemoRender = () => {

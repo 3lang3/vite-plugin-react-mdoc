@@ -22,6 +22,7 @@ export default {
   markdown(
     raw: string,
     fileAbsPath: string,
+    config?: any,
     {
       type = 'jsx',
       cacheKey = fileAbsPath,
@@ -39,7 +40,7 @@ export default {
 
     if (!result) {
       try {
-        result = { value: remark(raw, fileAbsPath, type, masterKey) };
+        result = { value: remark(raw, fileAbsPath, type, masterKey, config) };
       } catch (error) {
         console.log('[transformer.markdown error]', error);
         // return empty result & cache error

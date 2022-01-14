@@ -18,9 +18,9 @@ class ExportedContent {
   }
 }
 
-export async function markdownToDoc(code: string, id: string, reactBabelPlugin) {
+export async function markdownToDoc(code: string, id: string, reactBabelPlugin, viteConfig) {
   const content = new ExportedContent();
-  const rs = transformer.markdown(code, id);
+  const rs = transformer.markdown(code, id, viteConfig);
   const {
     data: { demos = [] },
     contents,

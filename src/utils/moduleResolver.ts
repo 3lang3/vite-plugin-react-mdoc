@@ -69,7 +69,7 @@ export const getModuleResolvePath = ({
       })(fs.statSync(basePath).isDirectory() ? basePath : path.parse(basePath).dir, sourcePath),
     );
   } catch (err) {
-      console.error(`[dumi]: cannot resolve module ${sourcePath} from ${basePath}`);
+    if (!silent) console.error(`[dumi]: cannot resolve module ${sourcePath} from ${basePath}`);
     return ''
     // throw err;
   }

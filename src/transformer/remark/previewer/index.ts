@@ -127,6 +127,7 @@ const visitor = function (node, i, parent) {
           attrs: { src: node.properties.src, ...node.properties.meta },
           mdAbsPath: this.data('fileAbsPath'),
           node,
+          viteConfig: this.data('viteConfig'),
         });
       const result = caller();
       // get result from transformer

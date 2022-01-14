@@ -13,9 +13,15 @@ import meta from './meta';
 import sourceCode from './sourceCode';
 import codeBlock from './codeBlock';
 import previewer from './previewer';
+import custom from './custom';
 
-
-export default (source: string, fileAbsPath: string, type: 'jsx' | 'html', masterKey?: string) => {
+export default (
+  source: string,
+  fileAbsPath: string,
+  type: 'jsx' | 'html',
+  masterKey?: string,
+  viteConfig?: any,
+) => {
   const rehypeCompiler = {
     jsx: [jsxify],
     html: [stringify, { allowDangerousHtml: true, closeSelfClosing: true }],
@@ -28,12 +34,14 @@ export default (source: string, fileAbsPath: string, type: 'jsx' | 'html', maste
     .use(meta)
     .use(codeBlock)
     .use(rehype)
+    .use(custom)
     .use(sourceCode)
     .use(raw)
     .use(code)
     .use(previewer)
+    .data('viteConfig', viteConfig)
     .data('masterKey', masterKey)
-    .data('fileAbsPath', fileAbsPath)
+    .data('fileAbsPath', fileAbsPath);
 
   // apply compiler via type
   processor.use(rehypeCompiler[0], rehypeCompiler[1]);

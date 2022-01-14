@@ -71,13 +71,14 @@ export type IPreviewerTransformer = {
      * mdast node
      */
     node: IDumiElmNode;
+    viteConfig: any;
   }) => IPreviewerTransformerResult;
 };
 
 /**
  * builtin previewer transformer
  */
-const builtinPreviewerTransformer: IPreviewerTransformer['fn'] = ({ mdAbsPath, node }) => {
+const builtinPreviewerTransformer: IPreviewerTransformer['fn'] = ({ mdAbsPath, node, viteConfig }) => {
   const fileAbsPath = node.properties.filePath || mdAbsPath;
   let files: ReturnType<typeof getDepsForDemo>['files'] = {};
   let dependencies: ReturnType<typeof getDepsForDemo>['dependencies'] = {};
@@ -89,6 +90,7 @@ const builtinPreviewerTransformer: IPreviewerTransformer['fn'] = ({ mdAbsPath, n
       ({ files, dependencies } = getDepsForDemo(node.properties.source, {
         isTSX: /^tsx?$/.test(node.properties.lang),
         fileAbsPath,
+        viteConfig,
       }));
     } catch (error) {
       /* nothing */

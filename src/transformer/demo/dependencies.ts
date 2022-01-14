@@ -63,9 +63,11 @@ function analyzeDeps(
     fileAbsPath,
     entryAbsPath,
     files = {},
+    viteConfig = {},
   }: IDemoOpts & {
     entryAbsPath?: string;
     files?: IDepAnalyzeResult['files'];
+    viteConfig: any;
   },
 ): IDepAnalyzeResult {
   const cacheKey = fileAbsPath.endsWith('.md')
@@ -94,11 +96,15 @@ function analyzeDeps(
         // tranverse all require statement
         if (t.isProgram(callPath.parent)) {
           const requireStr = callPathNode.source.value;
+          
           const resolvePath = getModuleResolvePath({
-            basePath: fileAbsPath,
+            // basePath: fileAbsPath,
+            basePath: fileAbsPath.startsWith(viteConfig.root) ? fileAbsPath : viteConfig.root,
             sourcePath: requireStr,
             extensions: LOCAL_MODULE_EXT,
           });
+
+          // console.log(requireStr, fileAbsPath, resolvePath)
 
           const resolvePathParsed = path.parse(resolvePath);
           if (resolvePath.includes('node_modules')) {
@@ -202,6 +208,7 @@ function analyzeDeps(
           fileAbsPath: item.resolvePath,
           entryAbsPath: entryAbsPath || fileAbsPath,
           files,
+          viteConfig,
         });
 
         Object.assign(files, result.files);

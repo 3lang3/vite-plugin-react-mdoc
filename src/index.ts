@@ -84,7 +84,7 @@ const plugin = (userOptions: Options = {}): Plugin => {
     },
     async transform(code, id) {
       if (filter(id)) {
-        const { code: content, demos } = await markdownToDoc(code, id, reactBabelPlugin);
+        const { code: content, demos } = await markdownToDoc(code, id, reactBabelPlugin, config);
         cache.set(id, demos);
         demos.forEach(demo => {
           if (demo.filePath) {
@@ -97,7 +97,7 @@ const plugin = (userOptions: Options = {}): Plugin => {
     async handleHotUpdate(ctx) {
       if (filter(ctx.file)) {
         const source = await ctx.read();
-        const { demos } = await markdownToDoc(source, ctx.file, reactBabelPlugin);
+        const { demos } = await markdownToDoc(source, ctx.file, reactBabelPlugin, config);
         cache.set(ctx.file, demos);
         const updateModules: ModuleNode[] = [];
         demos.forEach(demo => {
