@@ -97,13 +97,12 @@ function analyzeDeps(
         if (t.isProgram(callPath.parent)) {
           const requireStr = callPathNode.source.value;
           const resolvePath = getModuleResolvePath({
-            // basePath: fileAbsPath,
-            basePath: fileAbsPath.startsWith(viteConfig.root) ? fileAbsPath : viteConfig.root,
+            basePath: fileAbsPath,
+            // basePath: fileAbsPath.startsWith(viteConfig.root) ? fileAbsPath : viteConfig.root,
             sourcePath: requireStr,
             extensions: LOCAL_MODULE_EXT,
             viteConfig,
           });
-
           const resolvePathParsed = path.parse(resolvePath);
           if (resolvePath.includes('node_modules')) {
             // save external deps
@@ -125,7 +124,6 @@ function analyzeDeps(
                 css: peerCSS,
               });
             });
-
             cache.dependencies.push({
               resolvePath,
               name: pkg.name,

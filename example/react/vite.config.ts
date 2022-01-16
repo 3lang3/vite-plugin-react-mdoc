@@ -5,4 +5,9 @@ import mdoc from 'vite-plugin-react-mdoc';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), mdoc() as any],
+  resolve: {
+    alias: {
+      'react-vant':  'react-vant',
+    },
+  },
 });

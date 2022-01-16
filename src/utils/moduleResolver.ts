@@ -21,7 +21,7 @@ interface IModuleResolverOpts {
  */
 const getPkgPathsFromPath = (identifier: string) => {
   const matches = identifier.match(/^(.*node_modules)\/((?:@[^/]+\/)?[^/]+)/) || [];
-
+  console.log(identifier)
   return {
     absSourcePath: identifier,
     absPkgModulePath: matches[0],
@@ -60,21 +60,22 @@ export const getModuleResolvePath = ({
   if (/^[a-z]@/.test(sourcePath) && getHostPkgPath(getPkgPathsFromPath(sourcePath).pkgName)) {
     return slash(path.join(ctx.umi.paths.absNodeModulesPath, sourcePath));
   }
-
+  const depResolver = resolve.create.sync({
+    extensions,
+    alias: viteConfig?.resolve?.alias,
+    symlinks: false,
+    mainFiles: ['index', 'package.json'],
+  });
   try {
-    console.log(viteConfig?.resolve?.alias)
     return slash(
-      resolve.create.sync({
-        extensions,
-        alias: viteConfig?.resolve?.alias,
-        symlinks: false,
-        mainFiles: ['index', 'package.json'],
-      })(fs.statSync(basePath).isDirectory() ? basePath : path.parse(basePath).dir, sourcePath),
+      depResolver(
+        fs.statSync(basePath).isDirectory() ? basePath : path.parse(basePath).dir,
+        sourcePath,
+      ),
     );
   } catch (err) {
     if (!silent) console.error(`[dumi]: cannot resolve module ${sourcePath} from ${basePath}`);
-    return ''
-    // throw err;
+    return slash(depResolver(viteConfig.root, sourcePath));
   }
 };
 
