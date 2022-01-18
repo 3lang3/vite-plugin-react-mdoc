@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { Button } from 'react-vant'
-import  './style/code.less'
+import './style/code.less'
 
-export default () => {
+export default (): React.ReactNode => {
   const [count, setCount] = React.useState<number>(0);
   return (
     <>

@@ -90,6 +90,7 @@ const builtinPreviewerTransformer: IPreviewerTransformer['fn'] = ({ mdAbsPath, n
       ({ files, dependencies } = getDepsForDemo(node.properties.source, {
         isTSX: /^tsx?$/.test(node.properties.lang),
         fileAbsPath,
+        entryAbsPath: fileAbsPath,
         viteConfig,
       }));
     } catch (error) {

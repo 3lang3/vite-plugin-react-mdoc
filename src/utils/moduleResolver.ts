@@ -21,7 +21,6 @@ interface IModuleResolverOpts {
  */
 const getPkgPathsFromPath = (identifier: string) => {
   const matches = identifier.match(/^(.*node_modules)\/((?:@[^/]+\/)?[^/]+)/) || [];
-  console.log(identifier)
   return {
     absSourcePath: identifier,
     absPkgModulePath: matches[0],
@@ -86,11 +85,12 @@ export const getModuleResolvePkg = ({
   basePath,
   sourcePath,
   extensions = DEFAULT_EXT,
+  viteConfig,
 }: IModuleResolverOpts) => {
   let version: string | null;
   let name: string | null;
   let peerDependencies;
-  const resolvePath = getModuleResolvePath({ basePath, sourcePath, extensions });
+  const resolvePath = getModuleResolvePath({ basePath, sourcePath, extensions, viteConfig });
   const { pkgName, absPkgModulePath } = getPkgPathsFromPath(resolvePath);
   // use project path as module path for local packages
   const modulePath = getHostPkgPath(pkgName) || absPkgModulePath;
@@ -114,8 +114,9 @@ export const getModuleResolveContent = ({
   basePath,
   sourcePath,
   extensions = DEFAULT_EXT,
+  viteConfig,
 }: IModuleResolverOpts) => {
-  const resolvePath = getModuleResolvePath({ basePath, sourcePath, extensions });
+  const resolvePath = getModuleResolvePath({ basePath, sourcePath, extensions, viteConfig });
 
   return resolvePath ? fs.readFileSync(resolvePath, 'utf8').toString() : '';
 };

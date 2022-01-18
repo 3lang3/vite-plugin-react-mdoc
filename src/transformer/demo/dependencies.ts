@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 import slash from 'slash2';
 import crypto from 'crypto';
@@ -12,6 +13,7 @@ import {
 import FileCache from '../../utils/cache';
 import type { IDemoOpts } from './options';
 import { getBabelOptions } from './options';
+import { getPkgData } from '../../utils/getHostPkgAlias';
 
 const cachers = {
   file: new FileCache(),
@@ -53,8 +55,10 @@ export const LOCAL_DEP_EXT = ['.jsx', '.tsx', '.js', '.ts'];
 
 export const LOCAL_MODULE_EXT = [...LOCAL_DEP_EXT, '.json'];
 
+export const STYLE_MODULE_EXT = ['.less', '.css', '.scss', '.sass', '.styl'];
+
 // local dependency extensions which will be collected
-export const PLAIN_TEXT_EXT = [...LOCAL_MODULE_EXT, '.less', '.css', '.scss', '.sass', '.styl'];
+export const PLAIN_TEXT_EXT = [...LOCAL_MODULE_EXT, ...STYLE_MODULE_EXT];
 
 function analyzeDeps(
   raw: string,
@@ -76,16 +80,20 @@ function analyzeDeps(
   const dependencies: IDepAnalyzeResult['dependencies'] = {};
   let cache: IAnalyzeCache = fileAbsPath && cachers.file.get(fileAbsPath);
 
+  const localPkg = getPkgData(viteConfig?.root);
+
   if (!cache) {
     cache = { dependencies: [], files: [] };
     // support to pass babel transform result directly
     let ast: any;
+
     try {
       ast = transformSync(
         raw,
         getBabelOptions({ isTSX, fileAbsPath, transformRuntime: false }),
       ).ast;
     } catch (err) {
+      console.log('error: ', fileAbsPath);
       //
     }
 
@@ -96,20 +104,47 @@ function analyzeDeps(
         // tranverse all require statement
         if (t.isProgram(callPath.parent)) {
           const requireStr = callPathNode.source.value;
-          const resolvePath = getModuleResolvePath({
-            basePath: fileAbsPath,
-            // basePath: fileAbsPath.startsWith(viteConfig.root) ? fileAbsPath : viteConfig.root,
-            sourcePath: requireStr,
-            extensions: LOCAL_MODULE_EXT,
-            viteConfig,
-          });
+          const isLocalPkg = requireStr === localPkg?.name;
+          let resolvePath = '';
+          if (!isLocalPkg) {
+            resolvePath = getModuleResolvePath({
+              basePath: fileAbsPath,
+              // basePath: fileAbsPath.startsWith(viteConfig.root) ? fileAbsPath : viteConfig.root,
+              sourcePath: requireStr,
+              extensions: LOCAL_MODULE_EXT,
+              viteConfig,
+            });
+          }
+
           const resolvePathParsed = path.parse(resolvePath);
-          if (resolvePath.includes('node_modules')) {
+          if (isLocalPkg) {
+            const css = getCSSForDep(localPkg.name);
+            const peerDeps: IAnalyzeCache['dependencies'][0]['peerDeps'] = [];
+
+            // process peer dependencies from dependency
+            Object.keys(localPkg.peerDependencies || {}).forEach(dep => {
+              const peerCSS = getCSSForDep(dep);
+              peerDeps.push({
+                name: dep,
+                version: localPkg.peerDependencies[dep],
+                // also collect css file for peerDependencies
+                css: peerCSS,
+              });
+            });
+            cache.dependencies.push({
+              resolvePath,
+              name: localPkg.name,
+              version: localPkg.version,
+              css,
+              peerDeps,
+            });
+          } else if (resolvePath.includes('node_modules')) {
             // save external deps
             const pkg = getModuleResolvePkg({
               basePath: fileAbsPath,
               sourcePath: resolvePath,
               extensions: LOCAL_MODULE_EXT,
+              viteConfig,
             });
             const css = getCSSForDep(pkg.name);
             const peerDeps: IAnalyzeCache['dependencies'][0]['peerDeps'] = [];
@@ -192,12 +227,20 @@ function analyzeDeps(
       // cache resolve content
       cachers.content.add(item.resolvePath, files[item.filename]);
 
+      // contunue to collect style import files
+      if (STYLE_MODULE_EXT.includes(ext)) {
+        if (item.resolvePath.endsWith('.less')) {
+          const styleFiles = analyzeStyleDeps(item.resolvePath, entryAbsPath, ext);
+          Object.assign(files, styleFiles);
+        }
+      }
       // continue to collect deps for dep
       if (LOCAL_DEP_EXT.includes(ext)) {
         const content = getModuleResolveContent({
           basePath: fileAbsPath,
           sourcePath: item.resolvePath,
           extensions: LOCAL_DEP_EXT,
+          viteConfig,
         });
         const result = analyzeDeps(content, {
           isTSX: /\.tsx?/.test(ext),
@@ -216,7 +259,6 @@ function analyzeDeps(
   if (fileAbsPath) {
     cachers.file.add(fileAbsPath, cache, cacheKey);
   }
-
   return { files, dependencies };
 }
 
@@ -255,3 +297,28 @@ export function getCSSForDep(dep: string) {
 }
 
 export default analyzeDeps;
+
+function analyzeStyleDeps(fileAbsPath, entryAbsPath, parentExt) {
+  const content = fs.readFileSync(fileAbsPath, 'utf8');
+  // Need refactor
+  // this reg couldn't cover all situations
+  const mats = content.match(/(?<=@import\s)\S*/gi) || [];
+  const files = {};
+  if (mats.length) {
+    mats.forEach(p => {
+      const requireStr = p.replace(/'|"|;/g, '');
+      const ext = path.extname(requireStr) || parentExt;
+      const requireStrWithExt = requireStr.endsWith(ext) ? requireStr : `${requireStr}.${ext}`;
+      const resolvePath = slash(path.resolve(path.dirname(fileAbsPath), requireStrWithExt));
+      const imporFiles = analyzeStyleDeps(resolvePath, entryAbsPath, ext);
+      Object.assign(files, imporFiles);
+      const filename = slash(path.relative(entryAbsPath || fileAbsPath, resolvePath)).replace(
+        /(\.\/|\..\/)/g,
+        '',
+      );
+      files[filename] = { import: requireStrWithExt, fileAbsPath: resolvePath };
+    });
+  }
+
+  return files;
+}
