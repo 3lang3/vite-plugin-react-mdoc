@@ -7,6 +7,8 @@
     "declaration": true,
     "noUnusedLocals": true,
     "esModuleInterop": true,
+    "emitDeclarationOnly": true,
+    "strict": true,
     "skipLibCheck": true,
     "module": "ESNext",
     "lib": ["ESNext", "DOM"]

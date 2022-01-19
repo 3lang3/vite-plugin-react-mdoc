@@ -50,7 +50,7 @@ export default function pre(): MDocUnifiedTransformer {
 
         if (parsed.tagName === 'pre') {
           const [, content] =
-            winEOL(node.value).match(/^<pre[^>]*>\n?([^]*?)<\/pre>$/) || [];
+            normalizePath(node.value).match(/^<pre[^>]*>\n?([^]*?)<\/pre>$/) || [];
 
           if (content) {
             parent.children.splice(
