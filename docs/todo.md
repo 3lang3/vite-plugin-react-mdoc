@@ -25,6 +25,7 @@ Parse \*.md file and get `pre` block runtime code.
   - replace `class` to `className`
   - add JSX wrapper
   - inject plugin option custom method
+  - HAVE FUN!
 
 
     
