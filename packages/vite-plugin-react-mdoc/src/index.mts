@@ -11,6 +11,7 @@ import language from './remark/language.mjs';
 import meta from './remark/meta.mjs';
 import pre from './remark/pre.mjs';
 import code from './remark/code.mjs';
+import previewer from './remark/previewer.mjs';
 import jsxify from './remark/jsxify.mjs';
 
 const ROOT = process.cwd();
@@ -37,6 +38,7 @@ async function main() {
     .use(rehypeRaw)
     .use(pre)
     .use(code)
+    .use(previewer)
     .data('fileAbsPath', mdpath)
     .data('viteConfig', 'a')
     .data('pluginOptions', pluginOptions);
