@@ -1,66 +1,96 @@
+import fs from 'fs';
+import path from 'path';
+import { isElement as is } from 'hast-util-is-element';
+import { hasProperty as has } from 'hast-util-has-property';
 import { visit } from 'unist-util-visit';
-import type { Transformer } from 'unified';
-import yaml from '../utils/yaml.mjs';
-import { Code } from 'mdast';
+import type { MDocElmNode, MDocUnifiedTransformer } from '../types';
+
+const ATTR_MAPPING = {
+  hideactions: 'hideActions',
+  defaultshowcode: 'defaultShowCode',
+  skipnodemodules: 'skipNodeModules',
+  skippropswithoutdoc: 'skipPropsWithoutDoc',
+  hidetitle: 'hideTitle',
+  demourl: 'demoUrl',
+};
 
 /**
- * parser for parse modifier of code block
- * @param meta  meta raw string
+ * parse custome HTML element attributes to properties
+ * @note  1. empty attribute will convert to true
+ *        2. JSON-like string will convert to JSON
+ *        3. workaround for restore property to camlCase that caused by hast-util-raw
+ * @param   attrs   original attributes
+ * @return  parsed properties
  */
-function codeBlockModifierParser(meta: string): Record<string, string> {
-  return (meta || '').split('|').reduce((result, item) => {
-    item = String.prototype.trim.call(item);
+export const parseElmAttrToProps = (attrs: Record<string, string>) => {
+  const parsed: Record<string, any> = Object.assign({}, attrs);
 
-    if (item) {
-      result[item] = true;
+  // restore camelCase attrs, because hast-util-raw will transform camlCase to lowercase
+  Object.entries(ATTR_MAPPING).forEach(([mark, attr]) => {
+    if (parsed[mark] !== undefined) {
+      parsed[attr] = parsed[mark];
+      delete parsed[mark];
     }
+  });
 
-    return result;
-  }, {});
-}
+  // convert empty string to boolean
+  Object.keys(parsed).forEach(attr => {
+    if (parsed[attr] === '') {
+      parsed[attr] = true;
+    }
+  });
 
-export type YamlNode = Omit<Code, 'meta' | 'type'> & {
-  meta: string | Record<string, string>;
-  type: string;
+  // try to parse JSON field value
+  Object.keys(parsed).forEach(attr => {
+    if (/^(\[|{)[^]*(]|})$/.test(parsed[attr])) {
+      try {
+        parsed[attr] = JSON.parse(parsed[attr]);
+      } catch (err) {
+        /* nothing */
+      }
+    }
+  });
+
+  return parsed;
 };
 
 /**
  * remark plugin for parse code tag to external demo
  */
-export default function code(): Transformer<YamlNode> {
+export default function code(): MDocUnifiedTransformer<MDocElmNode> {
   return tree => {
-    visit<YamlNode, string>(tree, 'code', node => {
-      const modifier = codeBlockModifierParser(node.meta as string);
-      const pluginOptions = this.data('pluginOptions');
-      if (
-        pluginOptions?.previewLangs?.includes(node.lang) &&
-        (!pluginOptions?.passivePreview ||
-          (pluginOptions.passivePreview && modifier.preview))
-      ) {
-        // extract frontmatters for embedded demo
-        const [, comments = '', content = ''] = node.value
-          // clear head break lines
-          .replace(/^\n\s*/, '')
-          // split head comments & remaining code
-          .match(/^(\/\*\*[^]*?\n\s*\*\/)?(?:\s|\n)*([^]+)?$/);
+    visit<MDocElmNode, string>(tree, 'element', (node, index, parent: any) => {
+      if (is(node, 'code') && has(node, 'src')) {
+        // const hasCustomTransformer = previewerTransforms.length > 1;
+        const { src, ...attrs } = node.properties;
+        const props = {
+          source: '',
+          lang: path.extname(src as string).slice(1),
+          filePath: path.join(path.dirname(this.data('fileAbsPath')), src as string),
+        };
+        const parsedAttrs = parseElmAttrToProps(attrs);
 
-        const frontmatter = comments
-          // clear / from head & foot for comment
-          .replace(/^\/|\/$/g, '')
-          // remove * from comments
-          .replace(/(^|\n)\s*\*+/g, '$1');
-
-        const meta = yaml(frontmatter);
-
-        if (modifier.pure) {
-          // clear useless meta if the lang with pure modifier
-          node.meta = (node.meta as string).replace(/ ?\| ?pure/, '') || null;
-        } else {
-          // customize type (use for rehype demo handler)
-          node.type = 'demo';
-          node.meta = meta;
-          node.value = content;
+        try {
+          props.source = fs.readFileSync(props.filePath, 'utf8').toString();
+          props.lang = path.extname(props.filePath).slice(1);
+        } catch (err) {
+          /* istanbul ignore next */
         }
+        // parent.tagName = 'div'
+        // replace original node
+        parent.children.splice(index, 1, {
+          type: 'element',
+          tagName: 'div',
+          position: node.position,
+          properties: {
+            type: 'previewer',
+            ...props,
+            src,
+            meta: {
+              ...parsedAttrs,
+            },
+          },
+        });
       }
     });
   };

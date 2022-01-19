@@ -3,3 +3,5 @@ dist
 pnpm-global
 # misc
 .DS_Store
+# log
+*.log

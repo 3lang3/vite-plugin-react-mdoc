@@ -1,4 +1,5 @@
-import { Transformer } from 'unified';
+import type { Transformer } from 'unified';
+import type { Node } from 'hast';
 
 export type MDocUnifiedTransformer<T = Parameters<Transformer>[0]> = (
   node: T,
@@ -53,4 +54,5 @@ export interface MDocElmNode extends Node {
   };
   tagName: string;
   children?: MDocElmNode[];
+  value?: string;
 }

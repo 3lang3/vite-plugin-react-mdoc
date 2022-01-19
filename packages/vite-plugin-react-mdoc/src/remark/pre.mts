@@ -22,10 +22,10 @@ function createSourceCode(lang: string, code: string, position: any) {
 /**
  * rehype plugin for convert pre code block to SourceCode compomnent
  */
-export default function pre(): MDocUnifiedTransformer {
+export default function pre(): MDocUnifiedTransformer<MDocElmNode> {
   return tree => {
     // handle md code block syntax
-    visit(tree, 'element', (node: any, i, parent) => {
+    visit<MDocElmNode, string>(tree, 'element', (node, i, parent) => {
       if (node.tagName === 'pre' && node.children?.[0]?.tagName === 'code') {
         const cls = node.children[0].properties.className || [];
         const lang =
@@ -36,7 +36,7 @@ export default function pre(): MDocUnifiedTransformer {
           1,
           createSourceCode(
             lang,
-            normalizePath(toString(node.children[0]).trim()),
+            normalizePath(toString(node.children[0] as any).trim()),
             node.position,
           ),
         );
@@ -44,9 +44,9 @@ export default function pre(): MDocUnifiedTransformer {
     });
 
     // handle pre tag syntax
-    visit(tree, 'raw', (node: any, i, parent) => {
+    visit<MDocElmNode, string>(tree, 'raw', (node, i, parent) => {
       if (/^<pre/.test(node.value)) {
-        const parsed = raw(node) as MDocElmNode;
+        const parsed = raw(node as any) as MDocElmNode;
 
         if (parsed.tagName === 'pre') {
           const [, content] =

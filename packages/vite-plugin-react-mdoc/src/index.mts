@@ -5,10 +5,12 @@ import remarkParse from 'remark-parse';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
 import rehype from './remark/rehype.mjs';
+import rehypeRaw from 'rehype-raw'
 import slug from './remark/slug.mjs';
-import code from './remark/code.mjs';
+import language from './remark/language.mjs';
 import meta from './remark/meta.mjs';
 import pre from './remark/pre.mjs';
+import code from './remark/code.mjs';
 import jsxify from './remark/jsxify.mjs';
 
 const ROOT = process.cwd();
@@ -30,9 +32,11 @@ async function main() {
     .use(remarkGfm)
     .use(remarkFrontmatter)
     .use(meta)
-    .use(code)
+    .use(language)
     .use(rehype)
+    .use(rehypeRaw)
     .use(pre)
+    .use(code)
     .data('fileAbsPath', mdpath)
     .data('viteConfig', 'a')
     .data('pluginOptions', pluginOptions);
