@@ -1,7 +1,7 @@
 import { visit } from 'unist-util-visit';
 import type { MDocUnifiedTransformer } from '../types'
-import yaml from '../utils/yaml.mjs';
-import type { YamlNode } from './language.mjs';
+import yaml from '../utils/yaml';
+import type { YamlNode } from './language';
 
 /**
  * remark plugin for generate file meta

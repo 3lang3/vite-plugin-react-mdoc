@@ -1,7 +1,7 @@
 import { visit } from 'unist-util-visit';
 import type { Transformer } from 'unified';
-import yaml from '../utils/yaml.mjs';
-import { Code } from 'mdast';
+import yaml from '../utils/yaml';
+import type { Code } from 'mdast';
 
 /**
  * parser for parse modifier of code block

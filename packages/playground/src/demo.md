@@ -12,7 +12,7 @@ this is a vite plugin project.
 
 ```jsx
 /**
- * title: asdaksdajds
+ * inline: true
  */
 
 import React from 'react';

@@ -55,4 +55,5 @@ export interface MDocElmNode extends Node {
   tagName: string;
   children?: MDocElmNode[];
   value?: string;
+  previewer?: boolean;
 }
