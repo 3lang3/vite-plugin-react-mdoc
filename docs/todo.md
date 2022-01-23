@@ -20,6 +20,7 @@ Parse \*.md file and get `pre` block runtime code.
   - makeup `Previewer` component
     - add `language`, `code`, `deps` and formatter props
   - replace `pre` and `code` tag with `Previewer` tag
+  - replace `SourceCode` with jsx transformed code
 
 - transform html to JSX
   - replace `class` to `className`
