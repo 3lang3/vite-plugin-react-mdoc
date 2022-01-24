@@ -40,6 +40,7 @@ interface IAnalyzeCache {
     resolvePath: string;
     requireStr: string;
     filename: string;
+    content?: string;
   }[];
 }
 
@@ -48,7 +49,7 @@ export interface IDepAnalyzeResult {
     version: string;
     css?: string;
   }>;
-  files: Record<string, { import: string; fileAbsPath: string }>;
+  files: Record<string, { import: string; fileAbsPath: string; content?: string; }>;
 }
 
 export const LOCAL_DEP_EXT = ['.jsx', '.tsx', '.js', '.ts'];
@@ -230,6 +231,9 @@ function analyzeDeps(
           sourcePath: item.resolvePath,
           extensions: LOCAL_DEP_EXT,
         });
+
+        files[item.filename].content = content
+
         const result = analyzeDeps(content, {
           isTSX: /\.tsx?/.test(ext),
           fileAbsPath: item.resolvePath,

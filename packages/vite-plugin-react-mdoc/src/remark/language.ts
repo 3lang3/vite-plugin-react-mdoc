@@ -1,7 +1,7 @@
 import { visit } from 'unist-util-visit';
 import type { Transformer } from 'unified';
-import yaml from '../utils/yaml';
 import type { Code } from 'mdast';
+import { getCodeMeta } from '../utils/getCodeMeta';
 
 /**
  * parser for parse modifier of code block
@@ -38,19 +38,7 @@ export default function language(): Transformer<YamlNode> {
           (pluginOptions.passivePreview && modifier.preview))
       ) {
         // extract frontmatters for embedded demo
-        const [, comments = '', content = ''] = node.value
-          // clear head break lines
-          .replace(/^\n\s*/, '')
-          // split head comments & remaining code
-          .match(/^(\/\*\*[^]*?\n\s*\*\/)?(?:\s|\n)*([^]+)?$/);
-
-        const frontmatter = comments
-          // clear / from head & foot for comment
-          .replace(/^\/|\/$/g, '')
-          // remove * from comments
-          .replace(/(^|\n)\s*\*+/g, '$1');
-
-        const meta = yaml(frontmatter);
+        const { content, meta, } = getCodeMeta(node.value)
         if (modifier.pure) {
           // clear useless meta if the lang with pure modifier
           node.meta = (node.meta as string).replace(/ ?\| ?pure/, '') || null;

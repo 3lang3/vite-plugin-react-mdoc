@@ -46,7 +46,6 @@ export default function pre(): MDocUnifiedTransformer<MDocElmNode> {
     visit<MDocElmNode, string>(tree, 'raw', (node, i, parent) => {
       if (/^<pre/.test(node.value)) {
         const parsed = raw(node as any) as MDocElmNode;
-        console.log('parsed:', parsed.properties.lang);
         if (parsed.tagName === 'pre') {
           const [, content] =
             normalizePath(node.value).match(/^<pre[^>]*>\n?([^]*?)<\/pre>$/) || [];

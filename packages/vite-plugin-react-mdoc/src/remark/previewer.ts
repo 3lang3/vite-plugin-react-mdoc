@@ -2,7 +2,10 @@ import { visit } from 'unist-util-visit';
 import slash from 'slash2';
 import type { MDocUnifiedTransformer, MDocElmNode } from '../types'
 import path from 'path';
-import analyzeDeps from '../utils/analyzeDeps';
+import { getCodeMeta } from '../utils/getCodeMeta';
+import { getPreviewerAnalyzeData } from '../utils/getPreviewerAnalyzeData';
+import type { IPreviewerTransformerResult } from '../utils/getPreviewerAnalyzeData';
+import { DEMO_COMPONENT_NAME } from '../const';
 
 
 /**
@@ -82,6 +85,54 @@ function getPreviewerId(yaml: Record<string, string>, mdAbsPath: string, codeAbs
 
 
 /**
+ * get demo dependencies meta data from previewer props
+ * @param props previewer props
+ * @param lang  node lang
+ */
+function getDemoDeps(
+  props: IPreviewerTransformerResult['previewerProps'],
+  lang: string,
+): Record<string, { type: string; value: string; }> {
+  return {
+    // append npm dependencies
+    ...Object.entries(props.dependencies || {}).reduce(
+      (deps, [pkg, { version }]) =>
+        Object.assign(deps, {
+          [pkg]: {
+            type: 'NPM',
+            // TODO: get real version rule from package.json
+            value: version,
+          },
+        }),
+      {},
+    ),
+    // append local file dependencies
+    ...Object.entries(props.sources).reduce(
+      (result, [file, item]) => {
+        return Object.assign(result, {
+          // handle legacy main file
+          ...(file === '_'
+            ? {
+              [`index.${lang}`]: {
+                type: 'FILE',
+                value: item[lang],
+              },
+            }
+            : {
+              [file]: {
+                type: 'FILE',
+                value: item.content,
+              },
+            }),
+        })
+      },
+      {},
+    ),
+  };
+}
+
+
+/**
  * remark plugin for generate file meta
  */
 export default function previewer(): MDocUnifiedTransformer<MDocElmNode> {
@@ -115,7 +166,7 @@ export default function previewer(): MDocUnifiedTransformer<MDocElmNode> {
       }
     }
 
-    visit<MDocElmNode, string>(tree, 'element', (node) => {
+    visit<MDocElmNode, string>(tree, 'element', (node, i, parent) => {
       if (node.tagName === 'div' && node.properties?.type === 'previewer') {
         // generate demo id
         const identifier = getPreviewerId(
@@ -123,17 +174,79 @@ export default function previewer(): MDocUnifiedTransformer<MDocElmNode> {
           fileAbsPath,
           node.properties.filePath || fileAbsPath,
         );
-        console.log(identifier, node.properties.meta);
-        if (!node.properties.meta?.inline) {
-          const { files, dependencies } = analyzeDeps(node.properties.source, {
-            isTSX: /^tsx?$/.test(node.properties.lang),
-            fileAbsPath,
-            viteConfig: this.data('viteConfig'),
-            pluginOptions: this.data('pluginOptions'),
-          });
-          
-  
-          console.log(files, dependencies);
+
+        const result = getPreviewerAnalyzeData({
+          node,
+          mdAbsPath: fileAbsPath,
+          viteConfig: this.data('viteConfig'),
+          pluginOptions: this.data('pluginOptions'),
+        })
+
+        let demoDeps: Record<string, { type: string; value: string; }>;
+        let previewerProps: IPreviewerTransformerResult['previewerProps'];
+
+        // fill fields for tranformer result
+        const decorateResult = (o) => {
+          // extra meta for external demo
+          if (node.properties.filePath) {
+            const { meta } = getCodeMeta(node.properties.source);
+
+            // save original attr meta on code tag, to avoid node meta override frontmatter in HMR
+            node.properties._ATTR_META = node.properties._ATTR_META || node.properties.meta;
+            node.properties.meta = Object.assign(meta, node.properties._ATTR_META);
+          }
+
+          // set componentName for previewer props
+          o.previewerProps.componentName = vFile.data.componentName;
+
+          // assign node meta to previewer props (allow user override props via frontmatter or attribute)
+          Object.assign(o.previewerProps, node.properties.meta);
+
+          // force override id for previewer props
+          o.previewerProps.identifier = identifier;
+
+          // fallback dependencies & sources
+          o.previewerProps.dependencies = o.previewerProps.dependencies || {};
+          o.previewerProps.sources = o.previewerProps.sources || {};
+          // generate demo dependencies from previewerProps.sources
+          demoDeps = getDemoDeps(o.previewerProps, node.properties.lang);
+          return o;
+        };
+
+        // export result
+        ({ previewerProps } = decorateResult(result));
+
+        // use to declare demos in the page component
+        vFile.data.demos = (vFile.data.demos || []).concat({
+          name: `${DEMO_COMPONENT_NAME}${(vFile.data.demos?.length || 0) + 1}`,
+          code: node.properties?.source,
+          inline: previewerProps.inline,
+        });
+
+        if (previewerProps.inline) {
+          // append demo component directly for inline demo and other transformer result
+          parent.children[i] = {
+            previewer: true,
+            type: 'element',
+            tagName: `${DEMO_COMPONENT_NAME}${vFile.data.demos.length}`,
+          } as any;
+        } else {
+          parent.children[i] = {
+            previewer: true,
+            type: 'element',
+            tagName: 'Previewer',
+            // TODO: read props from common @@/dumi/demos module to reduce bundle size
+            properties: {
+              'data-previewer-props-replaced': previewerProps.identifier,
+            },
+            children: [
+              {
+                type: 'element',
+                tagName: `${DEMO_COMPONENT_NAME}${vFile.data.demos.length}`,
+                properties: {},
+              },
+            ],
+          } as any;
         }
       }
     });

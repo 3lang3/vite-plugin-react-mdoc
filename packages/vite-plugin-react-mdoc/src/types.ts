@@ -44,6 +44,7 @@ export interface MDocVFileData {
     value: string;
     heading: string;
   }[];
+  demos?: any[];
 }
 
 export interface MDocElmNode extends Node {
