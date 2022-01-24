@@ -39,10 +39,8 @@ const plugin = (userOptions: Options = pluginOptions): Plugin => {
     name: PLUGIN_NAME,
     async transform(code, id) {
       if (filter(id)) {
-        // const { default: remark} = await import('remark-mdoc-core')
-        const content = await remark(code, id, viteConfig, pluginOptions)
-        console.log(content);
-        return { code: content };
+        await remark(code, id, viteConfig, pluginOptions)
+        return { code: '' };
       }
     },
   };

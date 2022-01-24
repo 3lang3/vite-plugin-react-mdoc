@@ -30,7 +30,6 @@ export default function pre(): MDocUnifiedTransformer<MDocElmNode> {
         const cls = node.children[0].properties.className || [];
         const lang =
           cls.join('').match(/language-(\w+)(?:$| )/)?.[1] || 'unknown';
-
         parent.children.splice(
           i,
           1,
@@ -47,7 +46,7 @@ export default function pre(): MDocUnifiedTransformer<MDocElmNode> {
     visit<MDocElmNode, string>(tree, 'raw', (node, i, parent) => {
       if (/^<pre/.test(node.value)) {
         const parsed = raw(node as any) as MDocElmNode;
-
+        console.log('parsed:', parsed.properties.lang);
         if (parsed.tagName === 'pre') {
           const [, content] =
             normalizePath(node.value).match(/^<pre[^>]*>\n?([^]*?)<\/pre>$/) || [];

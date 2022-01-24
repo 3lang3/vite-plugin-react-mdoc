@@ -6,7 +6,6 @@ import oRehype from 'remark-rehype';
 function demoHandler(h, { type, lang, value, position, ...props }) {
   // split source codes for previewer
   const clonedNode = { lang, value };
-
   return h(position, 'div', {
     type: 'previewer',
     lang,

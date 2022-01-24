@@ -51,7 +51,6 @@ export default function language(): Transformer<YamlNode> {
           .replace(/(^|\n)\s*\*+/g, '$1');
 
         const meta = yaml(frontmatter);
-
         if (modifier.pure) {
           // clear useless meta if the lang with pure modifier
           node.meta = (node.meta as string).replace(/ ?\| ?pure/, '') || null;

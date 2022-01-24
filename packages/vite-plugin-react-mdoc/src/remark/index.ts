@@ -3,7 +3,7 @@ import remarkParse from 'remark-parse';
 import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
 import rehype from './rehype';
-import rehypeRaw from 'rehype-raw'
+import raw from './raw'
 import slug from './slug';
 import language from './language';
 import meta from './meta';
@@ -12,7 +12,7 @@ import code from './code.js';
 import previewer from './previewer';
 import jsxify from './jsxify';
 
-export default async function remark(raw, id, viteConfig, pluginOptions): Promise<string> {
+export default async function remark(source, id, viteConfig, pluginOptions): Promise<string> {
   const processor = await unified()
     .use(remarkParse)
     .use(slug)
@@ -21,8 +21,8 @@ export default async function remark(raw, id, viteConfig, pluginOptions): Promis
     .use(meta)
     .use(language)
     .use(rehype)
-    .use(rehypeRaw)
     .use(pre)
+    .use(raw)
     .use(code)
     .use(previewer)
     .data('fileAbsPath', id)
@@ -31,6 +31,9 @@ export default async function remark(raw, id, viteConfig, pluginOptions): Promis
 
   processor.use(jsxify);
 
-  const file = processor.processSync(raw);
-  return String(file);
+  const file = processor.processSync(source);
+  const fileSource = String(file)
+
+  console.log(fileSource);
+  return fileSource;
 }

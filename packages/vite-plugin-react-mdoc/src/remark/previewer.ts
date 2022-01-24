@@ -26,7 +26,6 @@ const mdCodeBlockIdMap = new Map<string, { id: string; count: number; map: Map<s
  */
 function getPreviewerId(yaml: Record<string, string>, mdAbsPath: string, codeAbsPath: string) {
   let id = yaml.identifier || yaml.uuid;
-
   // do not generate identifier for inline demo
   if (yaml.inline) {
     return;
@@ -124,7 +123,7 @@ export default function previewer(): MDocUnifiedTransformer<MDocElmNode> {
           fileAbsPath,
           node.properties.filePath || fileAbsPath,
         );
-        console.log(identifier, node.properties);
+        console.log(identifier, node.properties.meta);
         if (!node.properties.meta?.inline) {
           const { files, dependencies } = analyzeDeps(node.properties.source, {
             isTSX: /^tsx?$/.test(node.properties.lang),

@@ -24,5 +24,3 @@ export default () => {
   )
 }
 ```
-
-<code src="./test.tsx"></code>
