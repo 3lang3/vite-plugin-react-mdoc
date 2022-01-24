@@ -12,7 +12,7 @@ this is a vite plugin project.
 
 ```jsx
 /**
- * inline: true
+ * title: hello
  */
 
 import React from 'react';
@@ -24,3 +24,5 @@ export default () => {
   )
 }
 ```
+
+<code title="codeTag" src="./test.tsx" />
