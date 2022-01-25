@@ -11,8 +11,9 @@ import pre from './pre';
 import code from './code.js';
 import previewer from './previewer';
 import jsxify from './jsxify';
+import type { MDocDemoType } from '../types';
 
-export default async function remark(source, id, viteConfig, pluginOptions): Promise<string> {
+export default async function remark(source, id, viteConfig, pluginOptions): Promise<{ demos: MDocDemoType[]; value: string; }> {
   const processor = await unified()
     .use(remarkParse)
     .use(slug)
@@ -31,9 +32,8 @@ export default async function remark(source, id, viteConfig, pluginOptions): Pro
 
   processor.use(jsxify);
 
-  const file = processor.processSync(source);
-  const fileSource = String(file)
-
-  console.log(fileSource);
-  return fileSource;
+  const { data, value } = processor.processSync(source);
+  const demos = data.demos as MDocDemoType[];
+  // console.log(value.toString());
+  return { demos, value: value.toString() };
 }

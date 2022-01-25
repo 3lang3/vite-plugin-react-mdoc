@@ -1,13 +1,13 @@
 import { visit } from 'unist-util-visit';
 import { toString } from 'hast-util-to-string';
 import { raw } from 'hast-util-raw';
-import { normalizePath } from 'vite';
 import type { MDocElmNode, MDocUnifiedTransformer } from '../types';
+import { winEOL } from '../utils/winEOL';
 
 function createSourceCode(lang: string, code: string, position: any) {
   return {
     type: 'element',
-    tagName: 'SourceCode',
+    tagName: 'Previewer',
     position,
     properties: {
       // use wrapper element to workaround for skip props escape
@@ -35,7 +35,7 @@ export default function pre(): MDocUnifiedTransformer<MDocElmNode> {
           1,
           createSourceCode(
             lang,
-            normalizePath(toString(node.children[0] as any).trim()),
+            winEOL(toString(node.children[0] as any).trim()),
             node.position,
           ),
         );
@@ -48,7 +48,7 @@ export default function pre(): MDocUnifiedTransformer<MDocElmNode> {
         const parsed = raw(node as any) as MDocElmNode;
         if (parsed.tagName === 'pre') {
           const [, content] =
-            normalizePath(node.value).match(/^<pre[^>]*>\n?([^]*?)<\/pre>$/) || [];
+            winEOL(node.value).match(/^<pre[^>]*>\n?([^]*?)<\/pre>$/) || [];
 
           if (content) {
             parent.children.splice(

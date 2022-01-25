@@ -44,7 +44,7 @@ export interface MDocVFileData {
     value: string;
     heading: string;
   }[];
-  demos?: any[];
+  demos?: MDocDemoType[];
 }
 
 export interface MDocElmNode extends Node {
@@ -57,4 +57,18 @@ export interface MDocElmNode extends Node {
   children?: MDocElmNode[];
   value?: string;
   previewer?: boolean;
+}
+
+export interface MDocDemoType {
+  id?: string;
+  name: string;
+  code: string;
+  inline: boolean;
+  filePath?: string;
+  props: {
+    lang: string;
+    dependencies: Record<string, { type: string; value: string; }>;
+    key: string;
+    meta: Record<string, any>
+  };
 }

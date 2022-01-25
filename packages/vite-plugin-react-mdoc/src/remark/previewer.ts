@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { visit } from 'unist-util-visit';
 import slash from 'slash2';
 import type { MDocUnifiedTransformer, MDocElmNode } from '../types'
@@ -121,7 +122,7 @@ function getDemoDeps(
             : {
               [file]: {
                 type: 'FILE',
-                value: item.content,
+                value: item.content || fs.readFileSync(item.path, 'utf-8').toString(),
               },
             }),
         })
@@ -182,7 +183,6 @@ export default function previewer(): MDocUnifiedTransformer<MDocElmNode> {
           pluginOptions: this.data('pluginOptions'),
         })
 
-        let demoDeps: Record<string, { type: string; value: string; }>;
         let previewerProps: IPreviewerTransformerResult['previewerProps'];
 
         // fill fields for tranformer result
@@ -209,18 +209,29 @@ export default function previewer(): MDocUnifiedTransformer<MDocElmNode> {
           o.previewerProps.dependencies = o.previewerProps.dependencies || {};
           o.previewerProps.sources = o.previewerProps.sources || {};
           // generate demo dependencies from previewerProps.sources
-          demoDeps = getDemoDeps(o.previewerProps, node.properties.lang);
+          if (!o.previewerProps.inline) {
+            o.previewerProps.dependencies = getDemoDeps(o.previewerProps, node.properties.lang);
+          }
+
           return o;
         };
 
         // export result
         ({ previewerProps } = decorateResult(result));
 
+        const componentProps = {
+          lang: node.properties.lang,
+          dependencies: previewerProps.dependencies as unknown as Record<string, { type: string; value: string; }>,
+          key: previewerProps.identifier,
+          meta: node.properties.meta,
+        }
         // use to declare demos in the page component
         vFile.data.demos = (vFile.data.demos || []).concat({
           name: `${DEMO_COMPONENT_NAME}${(vFile.data.demos?.length || 0) + 1}`,
           code: node.properties?.source,
           inline: previewerProps.inline,
+          filePath: node.properties.filePath,
+          props: componentProps
         });
 
         if (previewerProps.inline) {
@@ -234,18 +245,9 @@ export default function previewer(): MDocUnifiedTransformer<MDocElmNode> {
           parent.children[i] = {
             previewer: true,
             type: 'element',
-            tagName: 'Previewer',
-            // TODO: read props from common @@/dumi/demos module to reduce bundle size
-            properties: {
-              'data-previewer-props-replaced': previewerProps.identifier,
-            },
-            children: [
-              {
-                type: 'element',
-                tagName: `${DEMO_COMPONENT_NAME}${vFile.data.demos.length}`,
-                properties: {},
-              },
-            ],
+            tagName: 'Previewer', properties: {
+              'data-previewer-props-replaced': `${vFile.data.demos.length}`,
+            }
           } as any;
         }
       }

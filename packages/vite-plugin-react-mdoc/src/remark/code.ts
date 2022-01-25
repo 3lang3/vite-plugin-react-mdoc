@@ -76,7 +76,7 @@ export default function code(): MDocUnifiedTransformer<MDocElmNode> {
         } catch (err) {
           /* istanbul ignore next */
         }
-        // parent.tagName = 'div'
+        parent.tagName = 'div'
         // replace original node
         parent.children.splice(index, 1, {
           type: 'element',
