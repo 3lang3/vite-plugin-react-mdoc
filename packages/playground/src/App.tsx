@@ -21,7 +21,7 @@ function App() {
       <header className="App-header markdown">
         <MdContent
           previewer={props => {
-            // console.log(props);
+            console.log(props);
             return <MdPreviewer {...props} />;
           }}
         />

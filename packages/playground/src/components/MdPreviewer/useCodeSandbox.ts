@@ -139,7 +139,7 @@ export default (opts: Omit<MDocPreviewerProps, 'children'> | null, api: string =
 
       return () => form.remove();
     }
-  }, [opts]);
+  }, [JSON.stringify(opts)]);
 
   return handler;
 };

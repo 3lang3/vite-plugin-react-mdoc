@@ -33,7 +33,7 @@ export default async function remark(source, id, viteConfig, pluginOptions): Pro
   processor.use(jsxify);
 
   const { data, value } = processor.processSync(source);
-  const demos = data.demos as MDocDemoType[];
-  console.log(value.toString());
+  const demos = (data.demos || []) as MDocDemoType[];
+  // console.log(value.toString());
   return { demos, value: value.toString() };
 }

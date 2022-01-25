@@ -2,33 +2,83 @@ import Highlight, { defaultProps } from 'prism-react-renderer';
 import type { Language } from 'prism-react-renderer';
 import useCodeSandbox from './useCodeSandbox';
 import useCopy from './useCopy';
+import fileIcon from './file.svg';
+import codeIcon from './code.svg';
 import csbIcon from './csb.svg';
 import copyIcon from './copy.svg';
 import copyDoneIcon from './done.svg';
 import './index.less';
+import './theme.less';
 import 'prismjs/themes/prism.css';
+import { useMemo, useState } from 'react';
+
+type DependenciesType = {
+  type: string;
+  value: string;
+  css: boolean;
+};
 
 export type MDocPreviewerProps = {
   code: string;
   lang: string;
   key: string;
-  dependencies: Record<
-    string,
-    {
-      type: string;
-      value: string;
-      css: boolean;
-    }
-  >;
+  dependencies: Record<string, DependenciesType>;
   meta: Record<string, any>;
   children: React.ReactNode;
 };
 
-const DefaultRender = (props: Omit<MDocPreviewerProps, 'children'>) => (
+/**
+ * get source code type for file
+ * @param file    file path
+ * @param source  file source object
+ */
+function getSourceType(file: string) {
+  // use file extension as source type first
+  let type = file.match(/\.(\w+)$/)?.[1];
+
+  return type || 'jsx';
+}
+
+const FileTabs = ({
+  files,
+  defaultCode,
+  defaultLang,
+}: {
+  files: [string, DependenciesType][];
+  defaultCode: string;
+  defaultLang: string;
+}) => {
+  const [current, setCurrent] = useState<any>({
+    code: defaultCode,
+    lang: defaultLang,
+  });
+
+  const code = useMemo(() => current.code, [current]);
+  const lang = useMemo(() => current.lang, [current]);
+
+  return (
+    <div className="default-previewer__tabs">
+      {files.map(([filename, info]) => {
+        return (
+          <div
+            key={filename}
+            onClick={() => setCurrent({ code: info.value, lang: getSourceType(filename) })}
+            className="default-previewer__tabs-plane"
+          >
+            <img src={fileIcon} /> {filename}
+          </div>
+        );
+      })}
+      <DefaultRender code={code} lang={lang} />
+    </div>
+  );
+};
+
+const DefaultRender = ({ code, lang }: { code: string; lang: string }) => (
   <Highlight
     {...defaultProps}
-    code={props.code}
-    language={props.lang as Language}
+    code={code}
+    language={lang as Language}
     theme={undefined}
   >
     {({ className, style, tokens, getLineProps, getTokenProps }) => (
@@ -45,19 +95,29 @@ const DefaultRender = (props: Omit<MDocPreviewerProps, 'children'>) => (
   </Highlight>
 );
 
-const ActionsRender = (p: Omit<MDocPreviewerProps, 'children'>) => {
-  const props = p || {};
-  console.log(props);
+export default ({ children, ...props }: MDocPreviewerProps) => {
+  const dependenciesArr = useMemo(
+    () => Object.entries(props.dependencies || []),
+    [props.dependencies],
+  );
+  const files = useMemo(
+    () => dependenciesArr.filter(([_, el]) => el.type === 'FILE'),
+    [dependenciesArr],
+  );
+
   const openCsb = useCodeSandbox(props);
   const [copy, copyStatus] = useCopy();
-  return (
-    <div className="local-previewer">
-      <DefaultRender {...props} />
-      <div className="local-previewer__actions">
+  const [showSource, setShowSource] = useState(false);
+  const isDemo = ['tsx', 'jsx'].includes(props.lang) && children;
+
+  return isDemo ? (
+    <div className="default-previewer">
+      <div className="default-previewer__demo">{children}</div>
+      <div className="default-previewer__actions">
         {Object.keys(props?.dependencies || []).length ? (
           <button
             title="在codesandbox上尝试"
-            className="local-previewer__btn local-previewer__csb"
+            className="default-previewer__btn default-previewer__csb"
             onClick={openCsb}
           >
             <img src={csbIcon} />
@@ -65,21 +125,33 @@ const ActionsRender = (p: Omit<MDocPreviewerProps, 'children'>) => {
         ) : null}
         <button
           title="复制"
-          className="local-previewer__btn local-previewer__copy"
+          className="default-previewer__btn default-previewer__copy"
           onClick={() => copy(props.code)}
         >
           <img src={copyStatus === 'ready' ? copyIcon : copyDoneIcon} />
         </button>
+        <button
+          className="default-previewer__btn"
+          onClick={() => setShowSource(v => !v)}
+        >
+          <img src={codeIcon} />
+        </button>
       </div>
+      {showSource && (
+        <div className="default-previewer__source">
+          {files.length === 1 ? (
+            <DefaultRender {...props} />
+          ) : (
+            <FileTabs
+              files={files}
+              defaultCode={props.code}
+              defaultLang={props.lang}
+            />
+          )}
+        </div>
+      )}
     </div>
-  );
-};
-
-export default ({ children, ...props }: MDocPreviewerProps) => {
-  return (
-    <>
-      <ActionsRender {...props} />
-      {children}
-    </>
+  ) : (
+    <DefaultRender {...props} />
   );
 };

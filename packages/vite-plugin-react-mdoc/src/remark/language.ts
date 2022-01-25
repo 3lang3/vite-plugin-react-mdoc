@@ -32,6 +32,7 @@ export default function language(): Transformer<YamlNode> {
     visit<YamlNode, string>(tree, 'code', node => {
       const modifier = codeBlockModifierParser(node.meta as string);
       const pluginOptions = this.data('pluginOptions');
+
       if (
         pluginOptions?.previewLangs?.includes(node.lang) &&
         (!pluginOptions?.passivePreview ||

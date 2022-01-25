@@ -4,5 +4,5 @@ import mdoc from 'vite-plugin-react-mdoc';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), mdoc({ codeBlockOutput: ['markdown'] })]
+  plugins: [react(), mdoc({ codeBlockOutput: [ 'independent'] })]
 })

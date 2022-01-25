@@ -10,13 +10,21 @@ mdoc 提供了两种编写 demo 的方式，分别应对不同的场景。
 
 如果我们的 demo 非常轻量，建议直接编写代码块，比如：
 
+````md
 ```jsx
 import React from 'react';
 
 export default () => <h1>Hello mdoc!</h1>;
 ```
+````
 
-`jsx` 和 `tsx` 的代码块将会被 mdoc 解析为 React 组件，在右侧展示。
+`jsx` 和 `tsx` 的代码块将会被 mdoc 解析为 React 组件，以上代码块将会被渲染成：
+
+```jsx
+import React from 'react';
+
+export default () => <h1>Hello mdoc!</h1>;
+```
 
 但是在 markdown 代码块中编写代码会失去类型提示和校验，不能像直接在 `tsx` 中那样丝滑，因此我们推荐使用 VSCode 插件 [TS in Markdown](https://github.com/Amour1688/vscode-ts-in-markdown)。
 

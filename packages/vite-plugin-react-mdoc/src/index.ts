@@ -43,7 +43,7 @@ export interface Options {
    * ```
    */
   localPkgs?: Record<string, { version: string }>;
-  
+
   /**
    * 代码块输出形式
    * @default ["independent"]
@@ -51,7 +51,7 @@ export interface Options {
    * - independent 将代码块组件独立输出
    * - markdown 将代码块组件直接输出到文档中
    */
-   codeBlockOutput?: CodeBlockOutputType[];
+  codeBlockOutput?: CodeBlockOutputType[];
 }
 
 const pluginOptions: Options = {
@@ -66,7 +66,8 @@ const pluginOptions: Options = {
 }
 
 
-const plugin = (userOptions: Options = pluginOptions): Plugin => {
+const plugin = (options: Options = {}): Plugin => {
+  const userOptions = { ...pluginOptions, ...options };
   let server: ViteDevServer;
   let config: ResolvedConfig;
   let reactBabelPlugin: Plugin;
