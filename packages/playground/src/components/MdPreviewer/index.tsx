@@ -21,9 +21,10 @@ export type MDocPreviewerProps = {
     }
   >;
   meta: Record<string, any>;
+  children: React.ReactNode;
 };
 
-const DefaultRender = (props: MDocPreviewerProps) => (
+const DefaultRender = (props: Omit<MDocPreviewerProps, 'children'>) => (
   <Highlight
     {...defaultProps}
     code={props.code}
@@ -44,7 +45,7 @@ const DefaultRender = (props: MDocPreviewerProps) => (
   </Highlight>
 );
 
-const ActionsRender = (p: MDocPreviewerProps) => {
+const ActionsRender = (p: Omit<MDocPreviewerProps, 'children'>) => {
   const props = p || {};
   console.log(props);
   const openCsb = useCodeSandbox(props);
@@ -74,6 +75,11 @@ const ActionsRender = (p: MDocPreviewerProps) => {
   );
 };
 
-export default (props: MDocPreviewerProps) => {
-  return <ActionsRender {...props} />;
+export default ({ children, ...props }: MDocPreviewerProps) => {
+  return (
+    <>
+      <ActionsRender {...props} />
+      {children}
+    </>
+  );
 };

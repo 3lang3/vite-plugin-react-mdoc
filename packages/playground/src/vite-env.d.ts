@@ -18,12 +18,13 @@ declare module '*.md' {
       }
     >;
     meta: Record<string, any>;
+    children: React.ReactNode;
   }
 
   const MdContent: React.VFC<{
     previewer?: (props: MDocPreviewerProps) => React.ReactNode;
   }>;
-  const MdDemos: { Component: React.VFC; title?: string; id: string }[];
+  const MdDemos: ({ Component: React.VFC; key: string } & Record<string, any>)[];
 
   // Modify below per your usage
   export { MdContent, MdDemos };

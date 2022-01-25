@@ -2,12 +2,11 @@ import { MdContent, MdDemos } from './demo.md';
 import MdPreviewer from './components/MdPreviewer';
 import './App.css';
 
-
 const DemoRender = () => {
   return (
     <div className="demo">
-      {MdDemos.map(({ Component, ...props }) => (
-        <div key={props.id}>
+      {MdDemos.map(({ Component, key, ...props }) => (
+        <div key={key}>
           {props.title && <h4>{props.title}</h4>}
           <Component />
         </div>

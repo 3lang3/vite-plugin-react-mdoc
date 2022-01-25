@@ -27,7 +27,7 @@ function getTextContent(raw: string) {
  * get serialized data that use to submit to codesandbox.io
  * @param opts  previewer props
  */
-function getCSBData(opts: MDocPreviewerProps) {
+function getCSBData(opts: Omit<MDocPreviewerProps, 'children'>) {
   const isTSX = opts.lang === 'tsx';
   const ext = isTSX ? '.tsx' : '.jsx';
   const files: Record<string, { content: string }> = {};
@@ -114,7 +114,7 @@ ReactDOM.render(
  * @param opts  previewer opts
  * @note  return a open function for open demo on codesandbox.io
  */
-export default (opts: MDocPreviewerProps | null, api: string = CSB_API_ENDPOINT) => {
+export default (opts: Omit<MDocPreviewerProps, 'children'> | null, api: string = CSB_API_ENDPOINT) => {
   const [handler, setHandler] = useState<(...args: any) => void | undefined>();
 
   useEffect(() => {

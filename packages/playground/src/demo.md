@@ -28,7 +28,7 @@ mdoc 有一个非常重要的原则——**开发者应该像用户一样使用�
 
 ```jsx | pure
 // 正确示例
-import { Button } from 'hello-dumi';
+import { Button } from 'hello-mdoc';
 
 // 错误示例，用户不知道 Button 组件是哪里来的
 import Button from './index.tsx';
@@ -37,7 +37,7 @@ import Button from '@/Button/index.tsx';
 
 当我们的每个 demo 都秉持这一原则时，意味着我们写出的 demo，不仅可以用来调试组件、编写文档，还能被用户直接拷贝到项目中使用。
 
-也许你会有疑问，研发阶段的组件库源代码尚未发布成 NPM 包，怎么才能成功引入组件？无需担心，dumi 会为我们自动建立组件库 NPM 包 -> 组件库源代码的映射关系。
+也许你会有疑问，研发阶段的组件库源代码尚未发布成 NPM 包，怎么才能成功引入组件？无需担心，mdoc 会为我们自动建立组件库 NPM 包 -> 组件库源代码的映射关系。
 
 #### 外部 demo
 
@@ -92,7 +92,7 @@ export default () => <p>我会被直接嵌入</p>;
 ```
 ````
 
-相似地，我们可以搭配 配置项 - `resolve.passivePreview` 和 `preview` 修饰符来开启代码块的被动渲染模式，该模式用于仅将具有 `preview` 修饰符的 `jsx/tsx` 代码块渲染为 React 组件，而不再是全部 `jsx/tsx` 代码块。该方案一般用于避免给过多的 `jsx/tsx` 代码块手动添加 pure 修饰符。
+相似地，我们可以搭配 配置项 - `passivePreview` 和 `preview` 修饰符来开启代码块的被动渲染模式，该模式用于仅将具有 `preview` 修饰符的 `jsx/tsx` 代码块渲染为 React 组件，而不再是全部 `jsx/tsx` 代码块。该方案一般用于避免给过多的 `jsx/tsx` 代码块手动添加 pure 修饰符。
 
 ````md
 ```jsx | preview
