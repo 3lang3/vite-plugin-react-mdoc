@@ -52,15 +52,16 @@ export async function transformer(code: string, id: string, reactBabelPlugin, vi
   content.addExporting('MdContent');
 
   let exportDemosStr = '';
-  const exportDemos = demos.filter(el => !el.inline)
-  exportDemos.forEach((el, i) => {
-    if (i === 0) exportDemosStr += '[';
-    exportDemosStr += `{ Component: ${el.name}, id: '${el.id}',`;
-    exportDemosStr += '},';
-    if (i === exportDemos.length - 1) exportDemosStr += ']';
-  });
-  if (!exportDemos) exportDemosStr = '[]';
-
+  if (pluginOptions.codeBlockOutput.includes('independent')) {
+    const exportDemos = demos.filter(el => !el.inline)
+    exportDemos.forEach((el, i) => {
+      if (i === 0) exportDemosStr += '[';
+      exportDemosStr += `{ Component: ${el.name}, key: '${el.props.key}', ...${JSON.stringify(el.props.meta)},`;
+      exportDemosStr += '},';
+      if (i === exportDemos.length - 1) exportDemosStr += ']';
+    });
+  }
+  if (!exportDemosStr) exportDemosStr = '[]';
   content.addContext(`const MdDemos = ${exportDemosStr}`);
   content.addExporting('MdDemos');
 

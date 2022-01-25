@@ -12,13 +12,46 @@ const FILE_PATH_EXPORT_NAME = '___vitePluginReactMdocCodestring___';
 const cache: Map<string, MDocDemoType[]> = new Map();
 const importedIdSet: Map<string, string> = new Map();
 
+export type CodeBlockOutputType = 'independent' | 'markdown';
+
 export interface Options {
   include?: FilterPattern;
   exclude?: FilterPattern;
+  /** 强制制定root目录 一般用于cli构建工具 */
   root?: string;
+  /** 
+   * 接受预览的语言后缀 
+   * @default ["jsx","tsx"]
+   */
   previewLangs?: string[];
+  /**
+   * 代码块被动渲染模式
+   * 当为 true 时，仅将属于 previewLangs 且具有 preview 修饰符的代码块渲染为 ReactComponent 代码块。
+   * 一般用于仅希望渲染 previewLangs 中的少部分代码块，而不是全部。
+   */
   passivePreview?: boolean;
+  /**
+   * 手动收集deps
+   * 由于各种原因可能代码依赖收集有部分缺失，用来手动补全依赖
+   * 
+   * ```
+   * 'localPkgs': {
+   *  'react-vant': {
+   *    'version': '2.0.0-alpha16'
+   *  }
+   * }
+   * ```
+   */
   localPkgs?: Record<string, { version: string }>;
+  
+  /**
+   * 代码块输出形式
+   * @default ["independent"]
+   * 
+   * - independent 将代码块组件独立输出
+   * - markdown 将代码块组件直接输出到文档中
+   */
+   codeBlockOutput?: CodeBlockOutputType[];
 }
 
 const pluginOptions: Options = {
@@ -28,7 +61,8 @@ const pluginOptions: Options = {
     'react-vant': {
       version: '2.0.0'
     }
-  }
+  },
+  codeBlockOutput: ['independent', 'markdown']
 }
 
 

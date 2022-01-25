@@ -138,7 +138,9 @@ function getDemoDeps(
  */
 export default function previewer(): MDocUnifiedTransformer<MDocElmNode> {
   return (tree, vFile) => {
-    const fileAbsPath = this.data('fileAbsPath')
+    const fileAbsPath = this.data('fileAbsPath');
+    const pluginOptions = this.data('pluginOptions');
+
     if (fileAbsPath) {
       const mapObj = mdCodeBlockIdMap.get(fileAbsPath);
 
@@ -225,6 +227,8 @@ export default function previewer(): MDocUnifiedTransformer<MDocElmNode> {
           key: previewerProps.identifier,
           meta: node.properties.meta,
         }
+
+
         // use to declare demos in the page component
         vFile.data.demos = (vFile.data.demos || []).concat({
           name: `${DEMO_COMPONENT_NAME}${(vFile.data.demos?.length || 0) + 1}`,
@@ -233,6 +237,7 @@ export default function previewer(): MDocUnifiedTransformer<MDocElmNode> {
           filePath: node.properties.filePath,
           props: componentProps
         });
+
 
         if (previewerProps.inline) {
           // append demo component directly for inline demo and other transformer result
@@ -247,7 +252,14 @@ export default function previewer(): MDocUnifiedTransformer<MDocElmNode> {
             type: 'element',
             tagName: 'Previewer', properties: {
               'data-previewer-props-replaced': `${vFile.data.demos.length}`,
-            }
+            },
+            children: pluginOptions.codeBlockOutput.includes('markdown') ? [
+              {
+                type: 'element',
+                tagName: `${DEMO_COMPONENT_NAME}${vFile.data.demos.length}`,
+                properties: {},
+              },
+            ] : [],
           } as any;
         }
       }
