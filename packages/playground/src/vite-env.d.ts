@@ -1,25 +1,30 @@
 /// <reference types="vite/client" />
 
+declare module 'lz-string';
+
 declare module '*.md' {
   // When "Mode.React" is requested. VFC could take a generic like React.VFC<{ MyComponent: TypeOfMyComponent }>
   import React from 'react';
+  type MDocPreviewerProps = {
+    code: string;
+    lang: string;
+    key: string;
+    dependencies: Record<
+      string,
+      {
+        type: string;
+        value: string;
+        css: boolean;
+      }
+    >;
+    meta: Record<string, any>;
+  }
+
   const MdContent: React.VFC<{
-    previewer: (props: {
-      code: string;
-      language: string;
-      title?: string;
-      dependencies: Record<
-        string,
-        {
-          type: string;
-          value: string;
-          css: boolean;
-        }
-      >;
-    }) => React.ReactNode;
+    previewer?: (props: MDocPreviewerProps) => React.ReactNode;
   }>;
-  const Content: string;
+  const MdDemos: { Component: React.VFC; title?: string; id: string }[];
 
   // Modify below per your usage
-  export default Content;
+  export { MdContent, MdDemos };
 }

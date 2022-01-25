@@ -1,42 +1,30 @@
 .App {
-  text-align: center;
+  display: flex;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.prism-code {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 15px;
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #fff;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  width: 50vw;
+  padding: 16px;
+  color: #323232;
 }
 
-.App-link {
-  color: #61dafb;
+.demo {
+  width: 50vw;
+  background: #282c34;
+  color: #fff;
+  padding: 20px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-button {
-  font-size: calc(10px + 2vmin);
+pre {
+  background-color: #f6f7f9 !important;
 }

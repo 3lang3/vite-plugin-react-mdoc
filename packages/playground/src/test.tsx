@@ -7,7 +7,7 @@ export default () => {
   return (
     <>
       <Test1 />
-      <button onClick={() => setCount(v => v + 1)}>code tag: {count}</button>
+      <button onClick={() => setCount(v => v + 1)}>code tag(test.tsx): {count}</button>
     </>
   );
 };
