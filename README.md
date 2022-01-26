@@ -1,4 +1,4 @@
-# vite-plugin-mdoc
+# vite-plugin-react-mdoc
 
 A plugin enables you to import a Markdown file as various formats on your [vite](https://github.com/vitejs/vite) project inspirt by [dumi](https://github.com/umijs/dumi).
 
@@ -14,7 +14,7 @@ npm i -D vite-plugin-react-mdoc
 const mdoc = require('vite-plugin-react-mdoc');
 
 module.exports = {
-  plugins: [mdoc(options)],
+  plugins: [mdoc()],
 };
 ```
 
