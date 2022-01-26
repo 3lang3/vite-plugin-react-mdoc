@@ -62,7 +62,9 @@ const FileTabs = ({
         return (
           <div
             key={filename}
-            onClick={() => setCurrent({ code: info.value, lang: getSourceType(filename) })}
+            onClick={() =>
+              setCurrent({ code: info.value, lang: getSourceType(filename) })
+            }
             className="default-previewer__tabs-plane"
           >
             <img src={fileIcon} /> {filename}
@@ -74,26 +76,46 @@ const FileTabs = ({
   );
 };
 
-const DefaultRender = ({ code, lang }: { code: string; lang: string }) => (
-  <Highlight
-    {...defaultProps}
-    code={code}
-    language={lang as Language}
-    theme={undefined}
-  >
-    {({ className, style, tokens, getLineProps, getTokenProps }) => (
-      <pre className={className} style={style}>
-        {tokens.map((line, i) => (
-          <div {...getLineProps({ line, key: i })}>
-            {line.map((token, key) => (
-              <span {...getTokenProps({ token, key })} />
-            ))}
-          </div>
-        ))}
-      </pre>
-    )}
-  </Highlight>
-);
+const DefaultRender = ({
+  code,
+  lang,
+  showCopy,
+}: {
+  code: string;
+  lang: string;
+  showCopy?: boolean;
+}) => {
+  const [copy, copyStatus] = useCopy();
+  return (
+    <Highlight
+      {...defaultProps}
+      code={code}
+      language={lang as Language}
+      theme={undefined}
+    >
+      {({ className, style, tokens, getLineProps, getTokenProps }) => (
+        <pre className={`${className} default-pre`} style={style}>
+          {showCopy && (
+            <button
+              title="复制"
+              className="default-pre__btn"
+              onClick={() => copy(code)}
+            >
+              <img src={copyStatus === 'ready' ? copyIcon : copyDoneIcon} />
+            </button>
+          )}
+          {tokens.map((line, i) => (
+            <div {...getLineProps({ line, key: i })}>
+              {line.map((token, key) => (
+                <span {...getTokenProps({ token, key })} />
+              ))}
+            </div>
+          ))}
+        </pre>
+      )}
+    </Highlight>
+  );
+};
 
 export default ({ children, ...props }: MDocPreviewerProps) => {
   const dependenciesArr = useMemo(
@@ -105,14 +127,15 @@ export default ({ children, ...props }: MDocPreviewerProps) => {
     [dependenciesArr],
   );
 
+  const hasDeps = Object.keys(props?.dependencies || []).length > 0;
+
   const openCsb = useCodeSandbox(props);
   const [copy, copyStatus] = useCopy();
-  const [showSource, setShowSource] = useState(false);
-  const isDemo = ['tsx', 'jsx'].includes(props.lang) && children;
+  const [showSource, setShowSource] = useState(hasDeps && !children);
 
-  return isDemo ? (
+  return hasDeps ? (
     <div className="default-previewer">
-      <div className="default-previewer__demo">{children}</div>
+      {children && <div className="default-previewer__demo">{children}</div>}
       <div className="default-previewer__actions">
         {Object.keys(props?.dependencies || []).length ? (
           <button
@@ -137,6 +160,7 @@ export default ({ children, ...props }: MDocPreviewerProps) => {
           <img src={codeIcon} />
         </button>
       </div>
+
       {showSource && (
         <div className="default-previewer__source">
           {files.length === 1 ? (
@@ -152,6 +176,6 @@ export default ({ children, ...props }: MDocPreviewerProps) => {
       )}
     </div>
   ) : (
-    <DefaultRender {...props} />
+    <DefaultRender {...props} showCopy />
   );
 };
