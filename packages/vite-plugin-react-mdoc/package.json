@@ -5,7 +5,9 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "scripts": {
-    "dev": "tsup src/index.ts --watch --format esm,cjs",
+    "build": "tsup src/index.ts --format esm,cjs",
+    "dev": "pnpm build -- --watch",
+    "prepare": "pnpm build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "files": [
