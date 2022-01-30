@@ -1,5 +1,5 @@
 import { MdContent, MdDemos } from './demo.md';
-import MdPreviewer from './components/MdPreviewer';
+import { Previewer as MdPreviewer } from 'mdoc-default-previewer';
 import './App.css';
 
 const DemoRender = () => {
