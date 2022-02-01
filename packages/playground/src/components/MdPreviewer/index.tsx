@@ -7,10 +7,8 @@ import codeIcon from './code.svg';
 import csbIcon from './csb.svg';
 import copyIcon from './copy.svg';
 import copyDoneIcon from './done.svg';
-import './index.less';
-import './theme.less';
-import 'prismjs/themes/prism.css';
 import { useMemo, useState } from 'react';
+import './index.less';
 
 type DependenciesType = {
   type: string;
@@ -94,7 +92,7 @@ const DefaultRender = ({
       theme={undefined}
     >
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <pre className={`${className} default-pre`} style={style}>
+        <div className="default-pre">
           {showCopy && (
             <button
               title="复制"
@@ -104,14 +102,16 @@ const DefaultRender = ({
               <img src={copyStatus === 'ready' ? copyIcon : copyDoneIcon} />
             </button>
           )}
-          {tokens.map((line, i) => (
-            <div {...getLineProps({ line, key: i })}>
-              {line.map((token, key) => (
-                <span {...getTokenProps({ token, key })} />
-              ))}
-            </div>
-          ))}
-        </pre>
+          <pre className={className} style={style}>
+            {tokens.map((line, i) => (
+              <div {...getLineProps({ line, key: i })}>
+                {line.map((token, key) => (
+                  <span {...getTokenProps({ token, key })} />
+                ))}
+              </div>
+            ))}
+          </pre>
+        </div>
       )}
     </Highlight>
   );
@@ -153,12 +153,14 @@ export default ({ children, ...props }: MDocPreviewerProps) => {
         >
           <img src={copyStatus === 'ready' ? copyIcon : copyDoneIcon} />
         </button>
-        <button
-          className="default-previewer__btn"
-          onClick={() => setShowSource(v => !v)}
-        >
-          <img src={codeIcon} />
-        </button>
+        {children && (
+          <button
+            className="default-previewer__btn"
+            onClick={() => setShowSource(v => !v)}
+          >
+            <img src={codeIcon} />
+          </button>
+        )}
       </div>
 
       {showSource && (

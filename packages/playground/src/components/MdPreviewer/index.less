@@ -1,7 +1,15 @@
-@import './theme.less';
+@import './code.less';
+
+/* 颜色表 */
+@c-primary: #4569d4;
+@c-text: #454d64;
+@c-link: @c-primary;
+@c-border: #ebedf1;
+@c-light-bg: #f9fafb;
 
 .default-pre {
   position: relative;
+  width: 100%;
 
   &:hover {
     .default-pre__btn {
@@ -113,9 +121,6 @@
     font-weight: 500;
     line-height: 1.40625;
 
-    [data-prefers-color='dark'] & {
-      color: @c-heading-dark;
-    }
 
     // anchor link
     &:hover > a[aria-hidden] {
@@ -126,11 +131,6 @@
       padding-right: 4px;
       line-height: 1;
       box-sizing: border-box;
-
-      @media @mobile {
-        width: 14px;
-        margin-left: -14px;
-      }
 
       &::after {
         content: '#';
@@ -188,11 +188,6 @@
     padding: 2px 5px;
     color: #d56161;
     background: darken(@c-light-bg, 1%);
-
-    [data-prefers-color='dark'] & {
-      color: #ff7875;
-      background: @c-light-bg-dark;
-    }
   }
 
   code {
@@ -225,11 +220,6 @@
     color: fadeout(@c-text, 30%);
     border-left: 4px solid @c-border;
     overflow: hidden;
-
-    [data-prefers-color='dark'] & {
-      color: fadeout(@c-text-dark, 30%);
-      border-color: @c-border-dark;
-    }
   }
 
   // list
@@ -249,27 +239,15 @@
     border-collapse: collapse;
     border: 1px solid @c-border;
 
-    [data-prefers-color='dark'] & {
-      border: 1px solid #3b434b;
-    }
-
     th,
     td {
       padding: 10px 24px;
       border: 1px solid @c-border;
-
-      [data-prefers-color='dark'] & {
-        border: 1px solid #3b434b;
-      }
     }
 
     th {
       font-weight: 600;
       background: @c-light-bg;
-
-      [data-prefers-color='dark'] & {
-        background: @c-light-bg-dark;
-      }
     }
 
     td:first-child {
@@ -289,10 +267,6 @@
     text-decoration: none;
     transition: opacity 0.2s;
     outline: none;
-
-    [data-prefers-color='dark'] & {
-      color: @c-primary-dark;
-    }
 
     &:hover {
       opacity: 0.7;
