@@ -94,10 +94,7 @@ function analyzeDeps(
           // rename filename.md to filename.tsx to prevent babel transform failed
           filename: fileAbsPath.replace(/\.md$/, isTSX ? '.tsx' : '.jsx'),
           presets: [
-            require.resolve('@babel/preset-react')
-          ],
-          plugins: [
-            require.resolve('@babel/plugin-syntax-jsx')
+            [require.resolve('@babel/preset-typescript'), { isTSX: true, allExtensions:true }]
           ],
           ast: true,
           babelrc: false,

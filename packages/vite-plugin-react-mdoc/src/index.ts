@@ -57,12 +57,7 @@ export interface Options {
 const pluginOptions: Options = {
   include: /\.md$/,
   previewLangs: ['jsx', 'tsx'],
-  localPkgs: {
-    'react-vant': {
-      version: '2.0.0'
-    }
-  },
-  codeBlockOutput: ['independent', 'markdown']
+  codeBlockOutput: ['independent']
 }
 
 
