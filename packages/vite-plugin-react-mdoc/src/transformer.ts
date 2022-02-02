@@ -47,6 +47,8 @@ export async function transformer(code: string, id: string, reactBabelPlugin, vi
     mdJsxResult = await reactBabelPlugin.transform(mdJsx, `\0${id}.tsx`);
   } catch (e) {
     // babel transform fail
+    console.log('reactBabelPlugin error: ', e);
+    mdJsxResult.code = `const MdContent = ''`
   }
   content.addContext(mdJsxResult.code.replaceAll('\\\\n', '\\n'));
   content.addExporting('MdContent');

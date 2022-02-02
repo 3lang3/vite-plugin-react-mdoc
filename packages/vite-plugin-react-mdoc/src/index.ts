@@ -52,6 +52,10 @@ export interface Options {
    * - markdown 将代码块组件直接输出到文档中
    */
   codeBlockOutput?: CodeBlockOutputType[];
+  /**
+   * 自定义替换html
+   */
+  replaceHtml?: (htmlString: string) => string;
 }
 
 const pluginOptions: Options = {

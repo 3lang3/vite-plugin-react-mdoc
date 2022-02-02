@@ -43,10 +43,11 @@ const formatJSXProps = (props: Record<string, any>): Record<string, any> => {
  */
 export default function jsxify(): Plugin<[] | [Options], Root, string> {
   const compiler: CompilerFunction<MDocElmNode> = tree => {
+    const pluginOptions = this.data('pluginOptions');
     visit<MDocElmNode, string>(tree, 'element', node => {
       node.properties = formatJSXProps(node.properties);
     });
-    let JSX = toJSX(tree, { wrapper: 'fragment' }) || '';
+    let JSX = toJSX(tree) || '';
 
     // append previewProps for previewer
     JSX = JSX.replace(
@@ -54,7 +55,10 @@ export default function jsxify(): Plugin<[] | [Options], Root, string> {
       `{...${DEMO_COMPONENT_NAME}$1PreviewerProps}`,
     );
 
-    return JSX;
+    if (pluginOptions?.replaceHtml) {
+      JSX = pluginOptions.replaceHtml(JSX);
+    }
+    return JSX
   };
 
   Object.assign(this, { Compiler: compiler });
