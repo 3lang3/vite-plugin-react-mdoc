@@ -20,7 +20,7 @@ class ExportedContent {
 
 export async function transformer(code: string, id: string, reactBabelPlugin, viteConfig, pluginOptions) {
   const content = new ExportedContent();
-  const { demos, value } = await remark(code, id, viteConfig, pluginOptions);
+  const { demos, meta, value } = await remark(code, id, viteConfig, pluginOptions);
 
   const compiledReactCode = `
       function ({ previewer = () => null }) {
@@ -66,6 +66,9 @@ export async function transformer(code: string, id: string, reactBabelPlugin, vi
   if (!exportDemosStr) exportDemosStr = '[]';
   content.addContext(`const MdDemos = ${exportDemosStr}`);
   content.addExporting('MdDemos');
+
+  content.addContext(`const frontmatter = ${JSON.stringify(meta)}`)
+  content.addExporting('frontmatter');
 
   return {
     code: content.export(),

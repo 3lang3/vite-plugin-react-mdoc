@@ -5,9 +5,10 @@ import mdoc from 'vite-plugin-react-mdoc';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    react(), 
+    react(),
     mdoc({
-      codeBlockOutput: ['independent'], replaceHtml: (htmlString) => {
+      codeBlockOutput: ['independent'],
+      replaceHtml: (htmlString) => {
         const group = htmlString.replace(/(<h3\s+id=)/g, ':::$1').replace(/<h2/g, ':::<h2').split(':::');
         const replaceHtml = group
           .map((fragment) => {

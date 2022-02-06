@@ -26,6 +26,8 @@ declare module '*.md' {
   }>;
   const MdDemos: ({ Component: React.VFC; key: string } & Record<string, any>)[];
 
+  const frontmatter: Record<string, string>;
+
   // Modify below per your usage
-  export { MdContent, MdDemos };
+  export { MdContent, MdDemos, frontmatter };
 }
