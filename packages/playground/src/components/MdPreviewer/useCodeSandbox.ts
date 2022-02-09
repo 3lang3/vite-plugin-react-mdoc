@@ -121,6 +121,7 @@ export default (opts: Omit<MDocPreviewerProps, 'children'> | null, api: string =
     if (opts && Object.keys(opts.dependencies || []).length) {
       const form = document.createElement('form');
       const input = document.createElement('input');
+      const queryInput = document.createElement('input');
       const data = getCSBData(opts);
 
       form.method = 'POST';
@@ -128,10 +129,15 @@ export default (opts: Omit<MDocPreviewerProps, 'children'> | null, api: string =
       form.style.display = 'none';
       form.action = api;
       form.appendChild(input);
+      form.appendChild(queryInput);
       form.setAttribute('data-demo', opts.meta?.title || '');
 
       input.name = 'parameters';
       input.value = data;
+
+      queryInput.name = 'query'
+      queryInput.value = 'resolutionWidth=320&resolutionHeight=675'
+      
 
       document.body.appendChild(form);
 
