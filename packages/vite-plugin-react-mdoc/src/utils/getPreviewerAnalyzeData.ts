@@ -1,6 +1,7 @@
 import analyzeDeps from "./analyzeDeps";
 import type { IDepAnalyzeResult } from "./analyzeDeps";
 import { MDocElmNode } from "../types";
+import type { MDocOptions } from "..";
 
 
 export interface IPreviewerComponentProps {
@@ -131,6 +132,7 @@ export type IPreviewerTransformer = {
     node: MDocElmNode;
     viteConfig: any;
     pluginOptions: any;
+    rootPkgJson: MDocOptions;
   }) => IPreviewerTransformerResult;
 };
 
@@ -138,7 +140,7 @@ export type IPreviewerTransformer = {
 /**
  * builtin previewer transformer
  */
-export const getPreviewerAnalyzeData: IPreviewerTransformer['fn'] = ({ mdAbsPath, node, viteConfig, pluginOptions }) => {
+export const getPreviewerAnalyzeData: IPreviewerTransformer['fn'] = ({ mdAbsPath, node, viteConfig, pluginOptions, rootPkgJson }) => {
   const fileAbsPath = node.properties.filePath || mdAbsPath;
   let files: IDepAnalyzeResult['files'] = {};
   let dependencies: IDepAnalyzeResult['dependencies'] = {};
@@ -151,7 +153,8 @@ export const getPreviewerAnalyzeData: IPreviewerTransformer['fn'] = ({ mdAbsPath
         isTSX: /^tsx?$/.test(node.properties.lang),
         fileAbsPath,
         viteConfig,
-        pluginOptions
+        pluginOptions,
+        rootPkgJson
       }));
     } catch {
       /* nothing */

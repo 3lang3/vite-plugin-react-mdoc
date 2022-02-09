@@ -183,6 +183,7 @@ export default function previewer(): MDocUnifiedTransformer<MDocElmNode> {
           mdAbsPath: fileAbsPath,
           viteConfig: this.data('viteConfig'),
           pluginOptions: this.data('pluginOptions'),
+          rootPkgJson: this.data('rootPkgJson')
         })
 
         let previewerProps: IPreviewerTransformerResult['previewerProps'];

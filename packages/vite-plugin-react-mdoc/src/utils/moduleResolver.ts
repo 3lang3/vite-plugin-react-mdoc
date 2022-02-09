@@ -17,6 +17,13 @@ interface IModuleResolverOpts {
   viteConfig?: ResolvedConfig;
 }
 
+export function getPkgJsonForPath(absPath: string) {
+  const pkgPath = path.join(absPath, 'package.json');
+  if (fs.existsSync(pkgPath)) {
+    return require(pkgPath);
+  }
+  return {};
+}
 
 function getPkgAliasForPath(absPath: string) {
   const result: [string, string] = ['', absPath];
@@ -42,7 +49,6 @@ const getHostPkgAlias = (aliasPath?) => {
  */
 const getPkgPathsFromPath = (identifier: string) => {
   const matches = identifier.match(/^(.*node_modules)\/((?:@[^/]+\/)?[^/]+)/) || [];
-
   return {
     absSourcePath: identifier,
     absPkgModulePath: matches[0],
@@ -77,11 +83,7 @@ export const getModuleResolvePath = ({
   silent,
   viteConfig,
 }: IModuleResolverOpts) => {
-  // treat local packages as 3rd-party module for collect as dependencies
-  if (/^[a-z]@/.test(sourcePath) && getHostPkgPath(getPkgPathsFromPath(sourcePath).pkgName)) {
-    return slash(path.join(path.join(viteConfig?.root, 'node_modules'), sourcePath));
-  }
-  
+
   const depResolver = resolve.create.sync({
     extensions,
     alias: viteConfig?.resolve?.alias,

@@ -2,10 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import { createFilter } from '@rollup/pluginutils';
 import type { FilterPattern } from '@rollup/pluginutils';
-import { ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite';
+import { ModuleNode, PluginOption, ResolvedConfig, ViteDevServer } from 'vite';
 import { transformer } from './transformer';
 import type { MDocDemoType } from './types';
 
+const CWD = process.cwd();
 const PLUGIN_NAME = 'vite-plugin-react-mdoc';
 const FILE_PATH_EXPORT_NAME = '___vitePluginReactMdocCodestring___';
 
@@ -14,11 +15,9 @@ const importedIdSet: Map<string, string> = new Map();
 
 export type CodeBlockOutputType = 'independent' | 'markdown';
 
-export interface Options {
+export interface MDocOptions {
   include?: FilterPattern;
   exclude?: FilterPattern;
-  /** 强制制定root目录 一般用于cli构建工具 */
-  root?: string;
   /** 
    * 接受预览的语言后缀 
    * @default ["jsx","tsx"]
@@ -58,25 +57,25 @@ export interface Options {
   replaceHtml?: (htmlString: string) => string;
 }
 
-const pluginOptions: Options = {
+const pluginOptions: MDocOptions = {
   include: /\.md$/,
   previewLangs: ['jsx', 'tsx'],
   codeBlockOutput: ['independent']
 }
 
 
-const plugin = (options: Options = {}): Plugin => {
+const plugin = (options: MDocOptions = {}): PluginOption => {
   const userOptions = { ...pluginOptions, ...options };
   let server: ViteDevServer;
   let config: ResolvedConfig;
-  let reactBabelPlugin: Plugin;
+  let reactBabelPlugin: PluginOption;
   const filter = createFilter(userOptions.include || /\.md$/, userOptions.exclude);
 
   return {
     name: PLUGIN_NAME,
     configResolved(resolvedConfig) {
       // store the resolved config
-      config = { ...resolvedConfig, root: userOptions?.root || resolvedConfig.root };
+      config = resolvedConfig;
       reactBabelPlugin = resolvedConfig.plugins.find(el => el.name === 'vite:react-babel');
     },
     configureServer(_server) {
@@ -89,7 +88,7 @@ const plugin = (options: Options = {}): Plugin => {
         const sourceId = Buffer.from(sourceIdBase64, 'base64').toString('ascii');
         const idPath: string = id.startsWith(sourceId)
           ? id
-          : path.join(config.root, id.substring(1));
+          : path.join(CWD, id.substring(1));
         return idPath;
       }
     },

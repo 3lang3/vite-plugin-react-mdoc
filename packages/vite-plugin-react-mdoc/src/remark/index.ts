@@ -12,8 +12,12 @@ import code from './code.js';
 import previewer from './previewer';
 import jsxify from './jsxify';
 import type { MDocDemoType } from '../types';
+import { getPkgJsonForPath } from '../utils/moduleResolver';
+
+const CWD = process.cwd();
 
 export default async function remark(source, id, viteConfig, pluginOptions): Promise<{ demos: MDocDemoType[]; value: string; meta: Record<string, string> }> {
+  const rootPkgJson = getPkgJsonForPath(CWD)
   const processor = await unified()
     .use(remarkParse)
     .use(slug)
@@ -28,7 +32,8 @@ export default async function remark(source, id, viteConfig, pluginOptions): Pro
     .use(previewer)
     .data('fileAbsPath', id)
     .data('viteConfig', viteConfig)
-    .data('pluginOptions', pluginOptions);
+    .data('pluginOptions', pluginOptions)
+    .data('rootPkgJson', rootPkgJson);
 
   processor.use(jsxify);
 

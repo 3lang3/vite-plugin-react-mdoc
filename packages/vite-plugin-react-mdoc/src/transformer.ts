@@ -1,4 +1,6 @@
 import slash from 'slash2';
+import type { PluginOption, ResolvedConfig } from 'vite';
+import type { MDocOptions } from '.';
 import remark from './remark';
 
 class ExportedContent {
@@ -18,7 +20,7 @@ class ExportedContent {
   }
 }
 
-export async function transformer(code: string, id: string, reactBabelPlugin, viteConfig, pluginOptions) {
+export async function transformer(code: string, id: string, reactBabelPlugin: PluginOption, viteConfig: ResolvedConfig, pluginOptions: MDocOptions) {
   const content = new ExportedContent();
   const { demos, meta, value } = await remark(code, id, viteConfig, pluginOptions);
 
@@ -44,7 +46,7 @@ export async function transformer(code: string, id: string, reactBabelPlugin, vi
 `;
   let mdJsxResult = { code: '' }
   try {
-    mdJsxResult = await reactBabelPlugin.transform(mdJsx, `\0${id}.tsx`);
+    mdJsxResult = await (reactBabelPlugin as any).transform(mdJsx, `\0${id}.tsx`);
   } catch (e) {
     // babel transform fail
     console.log('reactBabelPlugin error: ', e);

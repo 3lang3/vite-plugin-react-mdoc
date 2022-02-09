@@ -12,6 +12,7 @@ import {
 import FileCache from './cache';
 import type { ResolvedConfig } from 'vite';
 import { createRequire } from 'module';
+import type { MDocOptions } from '..';
 
 const require = createRequire(import.meta.url);
 
@@ -68,13 +69,15 @@ function analyzeDeps(
     files = {},
     viteConfig,
     pluginOptions,
+    rootPkgJson
   }: {
     isTSX: boolean;
     fileAbsPath: string;
     entryAbsPath?: string;
     files?: IDepAnalyzeResult['files'];
     viteConfig: ResolvedConfig;
-    pluginOptions: any;
+    pluginOptions: MDocOptions;
+    rootPkgJson: any;
   },
 ): IDepAnalyzeResult {
   const cacheKey = fileAbsPath.endsWith('.md')
@@ -94,7 +97,7 @@ function analyzeDeps(
           // rename filename.md to filename.tsx to prevent babel transform failed
           filename: fileAbsPath.replace(/\.md$/, isTSX ? '.tsx' : '.jsx'),
           presets: [
-            [require.resolve('@babel/preset-typescript'), { isTSX: true, allExtensions:true }]
+            [require.resolve('@babel/preset-typescript'), { isTSX: true, allExtensions: true }]
           ],
           ast: true,
           babelrc: false,
@@ -114,6 +117,17 @@ function analyzeDeps(
         ) {
           const requireStr = callPathNode.source.value;
 
+          // local pkg match
+          if (rootPkgJson?.name === requireStr) {
+            cache.dependencies.push({
+              resolvePath: '',
+              name: requireStr,
+              version: rootPkgJson.version,
+              peerDeps: [],
+            });
+            return
+          }
+          // manually specify match
           if (pluginOptions?.localPkgs?.[requireStr]) {
             cache.dependencies.push({
               resolvePath: '',
@@ -123,6 +137,7 @@ function analyzeDeps(
             });
             return
           }
+
           const resolvePath = getModuleResolvePath({
             basePath: fileAbsPath,
             sourcePath: requireStr,
@@ -238,6 +253,7 @@ function analyzeDeps(
           files,
           viteConfig,
           pluginOptions,
+          rootPkgJson,
         });
 
         Object.assign(files, result.files);
