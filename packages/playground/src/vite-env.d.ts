@@ -28,7 +28,7 @@ declare module '*.md' {
 
   const frontmatter: Record<string, string>;
 
-  const slugs: { depth: number; text: string; }[];
+  const slugs: { depth: number; text: string; id: string; }[];
 
   // Modify below per your usage
   export { MdContent, MdDemos, frontmatter, slugs };

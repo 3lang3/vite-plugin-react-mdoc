@@ -16,7 +16,7 @@ import { getPkgJsonForPath } from '../utils/moduleResolver';
 
 const CWD = process.cwd();
 
-type RemarkReturn = { demos: MDocDemoType[]; value: string; meta: Record<string, string>; slugs: { depth: number; text: string; }[]};
+type RemarkReturn = { demos: MDocDemoType[]; value: string; meta: Record<string, string>; slugs: { depth: number; text: string; id: string; }[] };
 
 export default async function remark(source, id, viteConfig, pluginOptions): Promise<RemarkReturn> {
   const rootPkgJson = getPkgJsonForPath(CWD)
