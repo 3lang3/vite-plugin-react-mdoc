@@ -1,9 +1,9 @@
-import { MdContent, MdDemos, frontmatter } from './demo.md';
+import { MdContent, MdDemos, frontmatter, slugs } from './demo.md';
 // import { Previewer as MdPreviewer } from 'mdoc-default-previewer';
 import MdPreviewer from './components/MdPreviewer';
 import './App.css';
 
-console.log(frontmatter);
+console.log(frontmatter, slugs);
 
 const DemoRender = () => {
   return (
@@ -24,7 +24,6 @@ function App() {
       <header className="App-header markdown">
         <MdContent
           previewer={props => {
-            console.log(props);
             return <MdPreviewer {...props} />;
           }}
         />

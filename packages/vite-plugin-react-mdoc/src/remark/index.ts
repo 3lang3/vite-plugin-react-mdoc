@@ -16,7 +16,9 @@ import { getPkgJsonForPath } from '../utils/moduleResolver';
 
 const CWD = process.cwd();
 
-export default async function remark(source, id, viteConfig, pluginOptions): Promise<{ demos: MDocDemoType[]; value: string; meta: Record<string, string> }> {
+type RemarkReturn = { demos: MDocDemoType[]; value: string; meta: Record<string, string>; slugs: { depth: number; text: string; }[]};
+
+export default async function remark(source, id, viteConfig, pluginOptions): Promise<RemarkReturn> {
   const rootPkgJson = getPkgJsonForPath(CWD)
   const processor = await unified()
     .use(remarkParse)
@@ -38,7 +40,7 @@ export default async function remark(source, id, viteConfig, pluginOptions): Pro
   processor.use(jsxify);
 
   const { data, value } = processor.processSync(source);
-  const { demos = [], ...mdMeta } = data as ({ demos: MDocDemoType[] } & Record<string, string>)
+  const { demos = [], slugs, ...mdMeta } = data as (RemarkReturn & Record<string, string>)
   // console.log(value.toString());
-  return { demos, meta: mdMeta, value: value.toString() };
+  return { demos, slugs, meta: mdMeta, value: value.toString() };
 }

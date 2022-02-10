@@ -2,7 +2,7 @@
 
 解析 `markdown` 文件同时输出 `jsx/tsx` 代码块，作为预览组件，灵感来自[dumi](https://d.umijs.org/)。
 
-### 写组件 demo
+## 写组件 demo
 
 mdoc 提供了两种编写 demo 的方式，分别应对不同的场景。
 
@@ -19,7 +19,7 @@ export default () => (
 )
 ```
 
-#### 代码块
+### 代码块
 
 如果我们的 demo 非常轻量，建议直接编写代码块，比如：
 
@@ -41,7 +41,7 @@ export default () => <h1>Hello mdoc!</h1>;
 
 但是在 markdown 代码块中编写代码会失去类型提示和校验，不能像直接在 `tsx` 中那样丝滑，因此我们推荐使用 VSCode 插件 [TS in Markdown](https://github.com/Amour1688/vscode-ts-in-markdown)。
 
-#### 在 demo 中引入组件
+### 在 demo 中引入组件
 
 mdoc 有一个非常重要的原则——**开发者应该像用户一样使用组件**。
 
@@ -60,7 +60,7 @@ import Button from '@/Button/index.tsx';
 
 也许你会有疑问，研发阶段的组件库源代码尚未发布成 NPM 包，怎么才能成功引入组件？无需担心，mdoc 会为我们自动建立组件库 NPM 包 -> 组件库源代码的映射关系。
 
-#### 外部 demo
+### 外部 demo
 
 如果我们的 demo 非常复杂，甚至可能有很多外部文件，那么建议使用外部 demo：
 
@@ -103,7 +103,7 @@ export default () => '我会被直接嵌入';
 export default () => <p>我会被直接嵌入</p>;
 ```
 
-### 不渲染代码块
+## 不渲染代码块
 
 如果我们希望某段 `jsx/tsx` 代码块被渲染为源代码，可以使用 pure 修饰符
 
@@ -126,7 +126,7 @@ export default () => <p>我会被直接嵌入</p>;
 ```
 ````
 
-### 普通的 markdown 渲染
+## 普通的 markdown 渲染
 
 ```html
 <div>this is div tag</div>

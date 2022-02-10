@@ -22,7 +22,7 @@ class ExportedContent {
 
 export async function transformer(code: string, id: string, reactBabelPlugin: PluginOption, viteConfig: ResolvedConfig, pluginOptions: MDocOptions) {
   const content = new ExportedContent();
-  const { demos, meta, value } = await remark(code, id, viteConfig, pluginOptions);
+  const { demos, slugs, meta, value } = await remark(code, id, viteConfig, pluginOptions);
 
   const compiledReactCode = `
       function ({ previewer = () => null }) {
@@ -52,7 +52,7 @@ export async function transformer(code: string, id: string, reactBabelPlugin: Pl
     console.log('reactBabelPlugin error: ', e);
     mdJsxResult.code = `const MdContent = ''`
   }
-  content.addContext(mdJsxResult.code.replaceAll('\\\\n', '\\n'));
+  content.addContext(mdJsxResult.code);
   content.addExporting('MdContent');
 
   let exportDemosStr = '';
@@ -71,6 +71,9 @@ export async function transformer(code: string, id: string, reactBabelPlugin: Pl
 
   content.addContext(`const frontmatter = ${JSON.stringify(meta)}`)
   content.addExporting('frontmatter');
+
+  content.addContext(`const slugs = ${JSON.stringify(slugs)}`)
+  content.addExporting('slugs');
 
   return {
     code: content.export(),
