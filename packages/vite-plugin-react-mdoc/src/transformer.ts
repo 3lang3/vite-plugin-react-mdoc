@@ -5,7 +5,7 @@ import remark from './remark';
 
 class ExportedContent {
   #exports: string[] = [];
-  #contextCode = '';
+  #contextCode = '/* @vite-ignore */\n';
 
   addContext(contextCode: string): void {
     this.#contextCode += `${contextCode}\n`;
@@ -74,6 +74,13 @@ export async function transformer(code: string, id: string, reactBabelPlugin: Pl
 
   content.addContext(`const slugs = ${JSON.stringify(slugs)}`)
   content.addExporting('slugs');
+
+  content.addContext(`
+  export default function (props) {
+    return props.children({ MdContent, MdDemos, frontmatter, slugs })
+  }
+  `)
+
 
   return {
     code: content.export(),
